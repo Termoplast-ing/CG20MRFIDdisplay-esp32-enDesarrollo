@@ -1,0 +1,798 @@
+{
+    "1689984896": {
+        "Corral 1": [
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            },
+            {
+                "caravana": "33345",
+                "timestamp": 1689984896,
+                "peso": "30"
+            }
+        ]
+    },
+    "1751433600": {
+        "Corral 1": [
+            {
+                "caravana": "333451234561234",
+                "timestamp": 1751433600,
+                "peso": "30"
+            }
+        ]
+    },
+    "1719792000": {
+        "Corral 1": [
+            {
+                "caravana": "444451234561234",
+                "timestamp": 1719792000,
+                "peso": "30"
+            }
+        ]
+    },
+    "1719878400": {
+        "Corral 1": [
+            {
+                "caravana": "444462222222222",
+                "timestamp": 1719878400,
+                "peso": "28"
+            }
+        ]
+    },
+    "1719964800": {
+        "Corral 1": [
+            {
+                "caravana": "444473333333333",
+                "timestamp": 1719964800,
+                "peso": "32"
+            }
+        ]
+    },
+    "1753315200": {
+        "Corral 1": [
+            {
+                "caravana": "444451234561234",
+                "timestamp": 1753315200,
+                "peso": "30"
+            }
+        ]
+    },
+    "1753401600": {
+        "Corral 1": [
+            {
+                "caravana": "444462222222222",
+                "timestamp": 1753401600,
+                "peso": "28"
+            }
+        ]
+    },
+    "1753488000": {
+        "Corral 1": [
+            {
+                "caravana": "444473333333333",
+                "timestamp": 1753488000,
+                "peso": "32"
+            }
+        ]
+    },
+    "2025-07-23": {
+        "Corral 1": [
+            {
+                "caravana": "444451234561234",
+                "timestamp": 1753326000,
+                "peso": "30",
+                "fecha_legible": "23/07/2025"
+            },
+            {
+                "caravana": "444451234561234",
+                "timestamp": 1753326000,
+                "peso": "30",
+                "fecha_legible": "23/07/2025"
+            }
+        ]
+    },
+    "2025-07-24": {
+        "Corral 1": [
+            {
+                "caravana": "444462222222222",
+                "timestamp": 1753412400,
+                "peso": "28",
+                "fecha_legible": "24/07/2025"
+            },
+            {
+                "caravana": "444462222222222",
+                "timestamp": 1753412400,
+                "peso": "28",
+                "fecha_legible": "24/07/2025"
+            }
+        ]
+    },
+    "2025-07-25": {
+        "Corral 1": [
+            {
+                "caravana": "444473333333333",
+                "timestamp": 1753498800,
+                "peso": "32",
+                "fecha_legible": "25/07/2025"
+            },
+            {
+                "caravana": "444473333333333",
+                "timestamp": 1753498800,
+                "peso": "32",
+                "fecha_legible": "25/07/2025"
+            }
+        ]
+    },
+    "2025-07-26": {
+        "Corral 1": [
+            {
+                "caravana": "44448",
+                "timestamp": 1753585200,
+                "peso": "29",
+                "fecha_legible": "26/07/2025"
+            },
+            {
+                "caravana": "44448",
+                "timestamp": 1753585200,
+                "peso": "29",
+                "fecha_legible": "26/07/2025"
+            }
+        ]
+    },
+    "2025-07-27": {
+        "Corral 1": [
+            {
+                "caravana": "44449",
+                "timestamp": 1753671600,
+                "peso": "31",
+                "fecha_legible": "27/07/2025"
+            },
+            {
+                "caravana": "44449",
+                "timestamp": 1753671600,
+                "peso": "31",
+                "fecha_legible": "27/07/2025"
+            }
+        ]
+    },
+    "2025-07-28": {
+        "Corral 1": [
+            {
+                "caravana": "44450",
+                "timestamp": 1753758000,
+                "peso": "30",
+                "fecha_legible": "28/07/2025"
+            },
+            {
+                "caravana": "44450",
+                "timestamp": 1753758000,
+                "peso": "30",
+                "fecha_legible": "28/07/2025"
+            }
+        ]
+    },
+    "2025-07-29": {
+        "Corral 1": [
+            {
+                "caravana": "44451",
+                "timestamp": 1753844400,
+                "peso": "27",
+                "fecha_legible": "29/07/2025"
+            },
+            {
+                "caravana": "44451",
+                "timestamp": 1753844400,
+                "peso": "27",
+                "fecha_legible": "29/07/2025"
+            }
+        ]
+    },
+    "2025-07-30": {
+        "Corral 1": [
+            {
+                "caravana": "44452",
+                "timestamp": 1753930800,
+                "peso": "33",
+                "fecha_legible": "30/07/2025"
+            },
+            {
+                "caravana": "44452",
+                "timestamp": 1753930800,
+                "peso": "33",
+                "fecha_legible": "30/07/2025"
+            }
+        ]
+    },
+    "2025-07-31": {
+        "Corral 1": [
+            {
+                "caravana": "44453",
+                "timestamp": 1754017200,
+                "peso": "30",
+                "fecha_legible": "31/07/2025"
+            },
+            {
+                "caravana": "44453",
+                "timestamp": 1754017200,
+                "peso": "30",
+                "fecha_legible": "31/07/2025"
+            }
+        ]
+    },
+    "2025-08-01": {
+        "Corral 1": [
+            {
+                "caravana": "44454",
+                "timestamp": 1754103600,
+                "peso": "29",
+                "fecha_legible": "01/08/2025"
+            },
+            {
+                "caravana": "44454",
+                "timestamp": 1754103600,
+                "peso": "29",
+                "fecha_legible": "01/08/2025"
+            }
+        ]
+    },
+    "2025-08-02": {
+        "Corral 1": [
+            {
+                "caravana": "44455",
+                "timestamp": 1754190000,
+                "peso": "28",
+                "fecha_legible": "02/08/2025"
+            },
+            {
+                "caravana": "44455",
+                "timestamp": 1754190000,
+                "peso": "28",
+                "fecha_legible": "02/08/2025"
+            }
+        ]
+    },
+    "2025-08-03": {
+        "Corral 1": [
+            {
+                "caravana": "44456",
+                "timestamp": 1754276400,
+                "peso": "32",
+                "fecha_legible": "03/08/2025"
+            },
+            {
+                "caravana": "44456",
+                "timestamp": 1754276400,
+                "peso": "32",
+                "fecha_legible": "03/08/2025"
+            }
+        ]
+    },
+    "1753333200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072401",
+                "timestamp": 1753333200,
+                "peso": "13"
+            }
+        ]
+    },
+    "1753340400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072402",
+                "timestamp": 1753340400,
+                "peso": "25"
+            }
+        ]
+    },
+    "1753347600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072403",
+                "timestamp": 1753347600,
+                "peso": "38"
+            }
+        ]
+    },
+    "1753362000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072404",
+                "timestamp": 1753362000,
+                "peso": "42"
+            }
+        ]
+    },
+    "1753376400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072405",
+                "timestamp": 1753376400,
+                "peso": "17"
+            }
+        ]
+    },
+    "1753390800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072406",
+                "timestamp": 1753390800,
+                "peso": "29"
+            }
+        ]
+    },
+    "1753419600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072501",
+                "timestamp": 1753419600,
+                "peso": "14"
+            }
+        ]
+    },
+    "1753426800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072502",
+                "timestamp": 1753426800,
+                "peso": "26"
+            }
+        ]
+    },
+    "1753434000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072503",
+                "timestamp": 1753434000,
+                "peso": "39"
+            }
+        ]
+    },
+    "1753448400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072504",
+                "timestamp": 1753448400,
+                "peso": "43"
+            }
+        ]
+    },
+    "1753462800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072505",
+                "timestamp": 1753462800,
+                "peso": "18"
+            }
+        ]
+    },
+    "1753477200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072506",
+                "timestamp": 1753477200,
+                "peso": "30"
+            }
+        ]
+    },
+    "1753506000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072601",
+                "timestamp": 1753506000,
+                "peso": "15"
+            }
+        ]
+    },
+    "1753513200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072602",
+                "timestamp": 1753513200,
+                "peso": "27"
+            }
+        ]
+    },
+    "1753520400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072603",
+                "timestamp": 1753520400,
+                "peso": "40"
+            }
+        ]
+    },
+    "1753534800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072604",
+                "timestamp": 1753534800,
+                "peso": "44"
+            }
+        ]
+    },
+    "1753549200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072605",
+                "timestamp": 1753549200,
+                "peso": "19"
+            }
+        ]
+    },
+    "1753563600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072606",
+                "timestamp": 1753563600,
+                "peso": "31"
+            }
+        ]
+    },
+    "1753592400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072701",
+                "timestamp": 1753592400,
+                "peso": "16"
+            }
+        ]
+    },
+    "1753599600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072702",
+                "timestamp": 1753599600,
+                "peso": "28"
+            }
+        ]
+    },
+    "1753606800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072703",
+                "timestamp": 1753606800,
+                "peso": "41"
+            }
+        ]
+    },
+    "1753621200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072704",
+                "timestamp": 1753621200,
+                "peso": "45"
+            }
+        ]
+    },
+    "1753635600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072705",
+                "timestamp": 1753635600,
+                "peso": "20"
+            }
+        ]
+    },
+    "1753650000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072706",
+                "timestamp": 1753650000,
+                "peso": "32"
+            }
+        ]
+    },
+    "1753333200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072401",
+                "timestamp": 1753333200,
+                "peso": "13"
+            }
+        ]
+    },
+    "1753340400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072402",
+                "timestamp": 1753340400,
+                "peso": "25"
+            }
+        ]
+    },
+    "1753347600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072403",
+                "timestamp": 1753347600,
+                "peso": "38"
+            }
+        ]
+    },
+    "1753362000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072404",
+                "timestamp": 1753362000,
+                "peso": "42"
+            }
+        ]
+    },
+    "1753376400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072405",
+                "timestamp": 1753376400,
+                "peso": "17"
+            }
+        ]
+    },
+    "1753390800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2024072406",
+                "timestamp": 1753390800,
+                "peso": "29"
+            }
+        ]
+    },
+    "1753419600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072501",
+                "timestamp": 1753419600,
+                "peso": "14"
+            }
+        ]
+    },
+    "1753426800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072502",
+                "timestamp": 1753426800,
+                "peso": "26"
+            }
+        ]
+    },
+    "1753434000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072503",
+                "timestamp": 1753434000,
+                "peso": "39"
+            }
+        ]
+    },
+    "1753448400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072504",
+                "timestamp": 1753448400,
+                "peso": "43"
+            }
+        ]
+    },
+    "1753462800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072505",
+                "timestamp": 1753462800,
+                "peso": "18"
+            }
+        ]
+    },
+    "1753477200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2025072506",
+                "timestamp": 1753477200,
+                "peso": "30"
+            }
+        ]
+    },
+    "1753506000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072601",
+                "timestamp": 1753506000,
+                "peso": "15"
+            }
+        ]
+    },
+    "1753513200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072602",
+                "timestamp": 1753513200,
+                "peso": "27"
+            }
+        ]
+    },
+    "1753520400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072603",
+                "timestamp": 1753520400,
+                "peso": "40"
+            }
+        ]
+    },
+    "1753534800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072604",
+                "timestamp": 1753534800,
+                "peso": "44"
+            }
+        ]
+    },
+    "1753549200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072605",
+                "timestamp": 1753549200,
+                "peso": "19"
+            }
+        ]
+    },
+    "1753563600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2026072606",
+                "timestamp": 1753563600,
+                "peso": "31"
+            }
+        ]
+    },
+    "1753592400": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072701",
+                "timestamp": 1753592400,
+                "peso": "16"
+            }
+        ]
+    },
+    "1753599600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072702",
+                "timestamp": 1753599600,
+                "peso": "28"
+            }
+        ]
+    },
+    "1753606800": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072703",
+                "timestamp": 1753606800,
+                "peso": "41"
+            }
+        ]
+    },
+    "1753621200": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072704",
+                "timestamp": 1753621200,
+                "peso": "45"
+            }
+        ]
+    },
+    "1753635600": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072705",
+                "timestamp": 1753635600,
+                "peso": "20"
+            }
+        ]
+    },
+    "1753650000": {
+        "Corral 1": [
+            {
+                "caravana": "GAN2027072706",
+                "timestamp": 1753650000,
+                "peso": "32"
+            }
+        ]
+    }
+}

@@ -1,0 +1,193 @@
+{
+    "calibraciones": {
+        "motor": 3,
+        "agua": 2,
+        "peso": 2.2
+    },
+    "caravanas_libres": [
+        "111111111111111",
+        "222222222222222",
+        "666666666666666",
+        "454545555555555",
+        "150000000000000"
+    ],
+    "indice_corporal": {
+        "tipo": "flaca",
+        "porcentaje": "66%"
+    },
+    "curvas_alimentacion": [
+        {
+            "nombre": "",
+            "segmentos": [
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                }
+            ]
+        },
+        {
+            "nombre": "",
+            "segmentos": [
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                },
+                {
+                    "dia": 0,
+                    "indice": "0%"
+                }
+            ]
+        },
+        {
+            "nombre": "curva1",
+            "segmentos": [
+                {
+                    "dia": 1,
+                    "indice": "50%"
+                }
+            ]
+        },
+        {
+            "nombre": "curva2",
+            "segmentos": [
+                {
+                    "dia": 1,
+                    "indice": "50%"
+                },
+                {
+                    "dia": 113,
+                    "indice": "100%"
+                }
+            ]
+        },
+        {
+            "nombre": "curva3",
+            "segmentos": [
+                {
+                    "dia": 1,
+                    "indice": "100%"
+                },
+                {
+                    "dia": 113,
+                    "indice": "50%"
+                }
+            ]
+        }
+    ]
+}
