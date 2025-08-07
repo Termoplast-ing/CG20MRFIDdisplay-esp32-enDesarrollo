@@ -1,0 +1,30 @@
+
+como estaba
+
+option "MinX" "55819"
+option "MaxX" "57093"
+option "MinY" "19599"
+option "MaxY" "19763"
+
+¿Por qué es importante?
+Cuando tocas la pantalla táctil, el controlador detecta las coordenadas físicas (por ejemplo, 0, 0 para la esquina superior izquierda, y 800, 480 para la esquina inferior derecha si la resolución de la pantalla es 800x480). Sin embargo, esas coordenadas no siempre coinciden perfectamente con las coordenadas de la pantalla. Es ahí donde entran los valores MinX, MaxX, MinY, MaxY: ellos ajustan cómo se mapean las coordenadas físicas de la pantalla táctil a la resolución de tu pantalla.
+
+Cómo ajustar los valores:
+Si el mouse funciona bien en los bordes pero el touch no (por ejemplo, el cursor está más arriba de lo que presionas), entonces probablemente necesites ajustar los valores de MinX, MaxX, MinY, MaxY para hacer coincidir mejor la pantalla táctil con los bordes de la pantalla.
+
+Aquí te doy un ejemplo de cómo ajustar esos valores. Si el touch está desfasado hacia arriba y a la izquierda, lo más probable es que debas ajustar MinX y MinY para que se desplace a la derecha y hacia abajo.
+
+Por ejemplo, en tu caso:
+
+bash
+Copiar
+Option "MinX" "55000"   # Ajusta para corregir la posición del borde izquierdo
+Option "MaxX" "57500"   # Ajusta para corregir la posición del borde derecho
+Option "MinY" "19000"   # Ajusta para corregir la posición del borde superior
+Option "MaxY" "20500"   # Ajusta para corregir la posición del borde inferior
+Pasos para ajustar estos valores:
+Si el toque en la pantalla se registra más arriba de lo que tocas, intenta aumentar el valor de MinY y disminuir el valor de MaxY. Esto moverá el área táctil hacia abajo.
+
+Si el toque se registra más a la izquierda de lo que tocas, intenta aumentar el valor de MinX y disminuir el valor de MaxX. Esto moverá el área táctil hacia la derecha.
+
+Ajusta los valores poco a poco para obtener la precisión deseada en los bordes. Después de cada ajuste, guarda los cambios y reinicia Xorg o el sistema.

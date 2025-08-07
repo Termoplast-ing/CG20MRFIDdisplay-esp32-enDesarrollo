@@ -1,0 +1,10 @@
+Ejemplo modo kiosko:
+
+# Iniciar en modo Kiosk (ejemplo con Chromium en pantalla completa)
+if [ -z "$DISPLAY" ] && [ "$(tty)" = "tty1" ]; then
+  startx -- -nocursor -- -depth 24
+  xset s off
+  xset -dpms
+  xset s noblank
+  chromium-browser --noerrdialogs --kiosk http://tusitio.com
+fi

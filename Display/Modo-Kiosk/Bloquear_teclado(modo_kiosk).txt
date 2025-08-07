@@ -1,0 +1,17 @@
+Bloquear teclado:
+
+--crea el archivo--
+sudo nano /etc/udev/rules.d/99-disable-mosart.rules
+
+ACTION=="add", ATTRS{idVendor}=="062a", ATTRS{idProduct}=="4101", RUN+="/bin/sh -c 'echo 0 > /sys$devpath/authorized'"
+
+sudo udevadm control --reload
+sudo udevadm trigger
+sudo reboot
+-----------------------------------------------------
+--Revertir los cambios (SSH)--
+sudo rm /etc/udev/rules.d/99-disable-mosart.rules
+
+sudo udevadm control --reload
+sudo udevadm trigger
+sudo reboot

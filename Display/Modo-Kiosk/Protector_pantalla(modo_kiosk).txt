@@ -1,0 +1,18 @@
+Protector Pantalla (modo kiosk):
+
+--instalar--
+sudo apt install xscreensaver
+
+/*sudo apt-get install xscreensaver xscreensaver-gl-extra xscreensaver-data-extra*/ opcional
+
+--inicia configuracion--
+xscreensaver-demo
+
+--Advanced: Ruta de la imagen-- 
+/home/cg20mrfid/Desktop/Protector_pantalla
+
+--Esto va en el xinitrc--
+xscreensaver -no-splash &
+
+--En caso de modificar ruta--
+xscreensaver-command -restart

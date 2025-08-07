@@ -1,0 +1,18 @@
+
+sudo raspi-config
+Interface Options > SSH > Enable
+-----------------------------------
+conecta con raspberry: (clave 1502)
+sh cg20mrfid@172.16.10.25
+-----------------------------------
+Entra a la carpeta:
+cd /home/cg20mrfid/Desktop/3/pantalla_tkinter
+-----------------------------------
+corre la app:
+DISPLAY=:0 python3 main.py
+-----------------------------------
+ver procesos:
+ps
+-----------------------------------
+cerrar proceso:
+kill -9 "ID" (el que dice python, 1559)

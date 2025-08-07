@@ -1,0 +1,5 @@
+--Obtener IP--
+hostname -I
+
+--Direccion raspberry pi-- 
+IP: 172.16.10.25

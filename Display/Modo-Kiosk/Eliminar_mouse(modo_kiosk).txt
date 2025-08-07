@@ -1,0 +1,12 @@
+eliminar mouse:
+sudo nano /usr/share/X11/xorg.conf.d/99-disable-mouse.conf
+
+Section "InputClass"
+    Identifier "Disable Mouse"
+    MatchIsPointer "on"
+    Option "Ignore" "on"
+EndSection
+
+
+revertir cambios:
+sudo rm /usr/share/X11/xorg.conf.d/99-disable-mouse.conf

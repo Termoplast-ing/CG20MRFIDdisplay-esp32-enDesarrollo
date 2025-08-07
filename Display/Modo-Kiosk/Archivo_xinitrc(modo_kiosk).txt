@@ -1,0 +1,14 @@
+archivo .xinitrc:
+
+#!bin/bash
+xscreensaver -no-splash &
+
+xset s off
+xset s noblank
+xset -dpms
+
+xrandr --output HDMI -1 --rotate left
+
+cd /home/cg20mrfid/Desktop/3/pantalla_tkinter
+matchbox-window-manager -use_cursor no &
+python3 main.py
