@@ -7,6 +7,7 @@ from datetime import datetime
 import json
 import os
 import time
+import sqlite3 as sql
 
 #def enviar_json(archivo_json):
 #    with open(archivo_json, "r") as archivo:
@@ -105,56 +106,56 @@ def enviar_json_gestion(archivo_json):
         respuesta = ser.readline().decode('utf-8').strip()
         print('ESP32 respondio:', respuesta)
     
-    
-print("Iniciando script..")
-ser = serial.Serial("/dev/serial0", 9600, timeout=None)
-print("Puerto serial abierto")
 
-timestamp = ""
-recibiendo = False
-print("Esperando inicio de timestamp...")
+# print("Iniciando script..")
+# ser = serial.Serial("/dev/serial0", 9600, timeout=None)
+# print("Puerto serial abierto")
 
-while True:
-    byte = ser.read(1).decode(errors="ignore")
-    print(f"Byte recibido: '{byte}'")
-    if byte == "<":
-        timestamp = ""
-        recibiendo = True
-        print("Delimitador inicial '<' recibido")
-    elif byte == ">" and recibiendo:
-        print("Delimitador final '>' recibido")
-        break
-    elif recibiendo:
-        timestamp += byte
-        print(f"Timestamp parcial: '{timestamp}'")
+# timestamp = ""
+# recibiendo = False
+# print("Esperando inicio de timestamp...")
+
+# while True:
+#     byte = ser.read(1).decode(errors="ignore")
+#     print(f"Byte recibido: '{byte}'")
+#     if byte == "<":
+#         timestamp = ""
+#         recibiendo = True
+#         print("Delimitador inicial '<' recibido")
+#     elif byte == ">" and recibiendo:
+#         print("Delimitador final '>' recibido")
+#         break
+#     elif recibiendo:
+#         timestamp += byte
+#         print(f"Timestamp parcial: '{timestamp}'")
         
-timestamp = timestamp.strip().replace("\0", "")
+# timestamp = timestamp.strip().replace("\0", "")
 
-if re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", timestamp):
-    try:
-        subprocess.run(["sudo", "date", "-s", timestamp], check=True)
-    except subprocess.CalledProcessError:
-        pass
+# if re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", timestamp):
+#     try:
+#         subprocess.run(["sudo", "date", "-s", timestamp], check=True)
+#     except subprocess.CalledProcessError:
+#         pass
 
-#lo nuevo
-print ("jueves")
-enviar_json_config("config/configuracion_sistema.json")
-#enviar_json("config/curvas.json")
-print("llego la confi")
-#enviar_json("datos_reales.json")
-enviar_json_gestion("datos_animales.json")
-print("llegaron los animales")
-time.sleep(1)
-print("paseGestion")
-print("Confirmacion 'OK' enviada al ESP32")
-print("Hora del sistema ahora:", datetime.now())
-ser.reset_input_buffer()
-msjOK={
-    "OK":1
-}
-mensaje = '<<<' + json.dumps(msjOK) + '>>>'
-ser.write(mensaje.encode('utf-8'))
-#ser.write(b"OK")
-
+# #lo nuevo
+# print ("jueves")
+# enviar_json_config("config/configuracion_sistema.json")
+# #enviar_json("config/curvas.json")
+# print("llego la confi")
+# #enviar_json("datos_reales.json")
+# enviar_json_gestion("datos_animales.json")
+# print("llegaron los animales")
+# time.sleep(1)
+# print("paseGestion")
+# print("Confirmacion 'OK' enviada al ESP32")
+# print("Hora del sistema ahora:", datetime.now())
+# ser.reset_input_buffer()
+# msjOK={
+#     "OK":1
+# }
+# mensaje = '<<<' + json.dumps(msjOK) + '>>>'
+# ser.write(mensaje.encode('utf-8'))
+# #ser.write(b"OK")
+# */
 App = MasterPanel()
 App.mainloop()
