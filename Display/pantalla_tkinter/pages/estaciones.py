@@ -75,9 +75,26 @@ class Estaciones:
                     return None
         except Exception:
             return None
-
+            
+    def cargar_fechas_inseminacion(self):
+        archivo = os.path.join(os.getcwd(), "datos_animales.json")
+        fechas_insem = {}
+        try:
+            with open(archivo, "r", encoding="utf-8") as f:
+                datos = json.load(f)
+                for corral, animales in datos.items():
+                    for animal in animales:
+                        if len(animal) >= 3:
+                            caravana = animal[0]
+                            fecha_insem = animal[2]  # formato: '2025-09-18'
+                            fechas_insem[caravana] = fecha_insem
+        except Exception as e:
+            print("Error cargando fechas de inseminación:", e)
+        return fechas_insem
+    
     def cargar_datos_json(self):
         ruta_json = os.path.join(os.getcwd(), "datos_reales.json")
+        fechas_insem = self.cargar_fechas_inseminacion()
         try:
             with open(ruta_json, "r", encoding="utf-8") as f:
                 datos = json.load(f)
@@ -95,11 +112,14 @@ class Estaciones:
                     fecha_legible = None
                     if isinstance(timestamp, int) or (isinstance(timestamp, str) and timestamp.isdigit()):
                         try:
-                            fecha_legible = datetime.fromtimestamp(int(timestamp)).strftime("%d/%m/%Y")
+                            fecha_legible = datetime.fromtimestamp(int(timestamp)).strftime("%Y-%m-%d")
                         except:
                             fecha_legible = None
                     else:
-                        fecha_legible = self.parsear_fecha(str(timestamp).split("T")[0])
+                        try:
+                            fecha_legible = str(timestamp).split("T")[0]
+                        except:
+                            fecha_legible = None
 
                     if fecha_legible is None:
                         continue
@@ -114,35 +134,120 @@ class Estaciones:
                         acumulados[clave] = 0.0
                     acumulados[clave] += peso_val
 
-        ordenado = sorted(acumulados.items(), key=lambda x: datetime.strptime(x[0][2], "%d/%m/%Y"))
+        ordenado = sorted(acumulados.items(), key=lambda x: datetime.strptime(x[0][2], "%Y-%m-%d"))
 
         resultado = []
-        for (corral, caravana, fecha), peso in ordenado:
-            resultado.append((corral.split()[-1], caravana, f"{peso:.2f} kg", fecha))
+        for (corral, caravana, fecha_pesaje), peso in ordenado:
+            #verificar si la caravana ya esta en resultado
+            if any(r[1] == caravana for r in resultado):
+                continue
+            corral_num = corral.split()[-1]
+            dia_ciclo = ""
+            if caravana in fechas_insem:
+                try:
+                    fecha_insem_dt = datetime.strptime(fechas_insem[caravana], "%Y-%m-%d")
+                    fecha_pesaje_dt = datetime.strptime(fecha_pesaje, "%Y-%m-%d")
+                    delta = (fecha_pesaje_dt - fecha_insem_dt).days + 1  # Día 1 es el día de inseminación
+                    if delta < 1:
+                        delta= "-"
+                    dia_ciclo = str(delta)
+                except:
+                    pass
+            resultado.append((corral_num, caravana, f"{peso:.2f} kg", dia_ciclo))
         return resultado
+
+
+    #def cargar_datos_json(self):
+    #    ruta_json = os.path.join(os.getcwd(), "datos_reales.json")
+    #    fechas_insem = self.cargar_fechas_inseminacion()
+    #    try:
+    #        with open(ruta_json, "r", encoding="utf-8") as f:
+    #            datos = json.load(f)
+    #    except Exception:
+    #        return {}
+
+    #    acumulados = {}
+    #    for dia, corrales in datos.items():
+    #        for corral, registros in corrales.items():
+    #            for registro in registros:
+    #                caravana = registro.get("caravana")
+    #                timestamp = registro.get("timestamp")
+    #                peso = registro.get("peso")
+
+    #                fecha_legible = None
+    #                if isinstance(timestamp, int) or (isinstance(timestamp, str) and timestamp.isdigit()):
+    #                    try:
+    #                        fecha_legible = datetime.fromtimestamp(int(timestamp)).strftime("%d/%m/%Y")
+    #                    except:
+    #                        fecha_legible = None
+    #                else:
+    #                    fecha_legible = self.parsear_fecha(str(timestamp).split("T")[0])
+
+    #                if fecha_legible is None:
+    #                    continue
+
+    #                try:
+    #                    peso_val = float(str(peso).replace(",", ".")) / 10.0
+    #                except:
+    #                    peso_val = 0.0
+
+    #                clave = (corral, caravana, fecha_legible)
+    #                if clave not in acumulados:
+    #                    acumulados[clave] = 0.0
+    #                acumulados[clave] += peso_val
+
+    #    ordenado = sorted(acumulados.items(), key=lambda x: datetime.strptime(x[0][2], "%d/%m/%Y"))
+
+    #    resultado = []
+    #    for (corral, caravana, fecha), peso in ordenado:
+    #        resultado.append((corral.split()[-1], caravana, f"{peso:.2f} kg", fecha))
+    #    return resultado
 
     def actualizar_tabla(self):
         datos = self.cargar_datos_json()
-    
-        # Obtener fecha actual en formato dd/mm/yyyy
-        fecha_actual = datetime.now().strftime("%d/%m/%Y")
-    
-        # Filtrar solo los datos que corresponden a la fecha actual
-        datos_filtrados = [item for item in datos if item[-1] == fecha_actual]
-    
+
+        # Filtrar solo los que tienen día de ciclo no vacío
+        datos_filtrados = [item for item in datos if item[-1]]
+
+        # Ordenar por día de ciclo numéricamente (de menor a mayor)
+        datos_filtrados.sort(key=lambda x: int(x[-1]) if str(x[-1]).isdigit() else 9999)
+
         # Limitar a 20 registros máximo
-        datos_filtrados = datos_filtrados[:20]
-    
+        datos_filtrados = datos_filtrados[:21]
+
         # Limpiar la tabla
         for item in self.treeview.get_children():
             self.treeview.delete(item)
-    
-        # Insertar solo los datos filtrados
+
+        # Insertar los datos
         for item in datos_filtrados:
             self.treeview.insert("", "end", values=item)
+
+        # Actualizar cada 2 minutos
+        self.parent_frame.after(15000, self.actualizar_tabla)
+
+    #def actualizar_tabla(self):
+    #    datos = self.cargar_datos_json()
+    
+        # Obtener fecha actual en formato dd/mm/yyyy
+    #    fecha_actual = datetime.now().strftime("%d/%m/%Y")
+    
+        # Filtrar solo los datos que corresponden a la fecha actual
+    #    datos_filtrados = [item for item in datos if item[-1] == fecha_actual]
+    
+        # Limitar a 20 registros máximo
+    #    datos_filtrados = datos_filtrados[:20]
+    
+        # Limpiar la tabla
+    #    for item in self.treeview.get_children():
+    #        self.treeview.delete(item)
+    
+        # Insertar solo los datos filtrados
+    #    for item in datos_filtrados:
+    #        self.treeview.insert("", "end", values=item)
     
         # Actualizar cada 2 minutos
-        self.parent_frame.after(150000, self.actualizar_tabla)
+    #    self.parent_frame.after(150000, self.actualizar_tabla)
     
     from datetime import datetime
 
@@ -213,10 +318,15 @@ class Estaciones:
                     if inicio < fin:
                         json_str = buffer[inicio:fin]
                         buffer = buffer[fin + len(delimitador_fin):]
+                        print("Mensaje recibido en Raspberry:", json_str)
                         try:
                             datos = json.loads(json_str)
                             self.guardar_en_archivo(datos)
-                            print("JSON recibido y guardado correctamente.")
+                            if hasattr(self.parent_frame, "modal_animal") and datos:
+                                caravana = datos[0].get("caravana","")
+                                if caravana:
+                                    self.parent_frame.after(0, lambda c=caravana: self.parent_frame.modal_animal(c))
+                            print("JSON recibido y modal ejecutando")
                         except json.JSONDecodeError:
                             print("Error al decodificar JSON:", json_str)
 
@@ -236,6 +346,8 @@ class Estaciones:
             fecha = animal.get("fecha", "")
             peso = animal.get("peso", "")
             corral_num = animal.get("corral", None)
+            #if hasattr(self.parent_frame, "modal_animal"):
+            #    self.parent_frame.after(0, lambda c=caravana: self.parent.modal_animal(c))
             if not fecha or not caravana or corral_num is None:
                 continue
             try:
@@ -259,9 +371,24 @@ class Estaciones:
                 "timestamp": fecha,
                 "peso": str(peso)
             })
+            #pruebo esto nuevo:
+            if caravana:
+                #if caravana not in self.parent_frame.datos_reales:
+                #    self.parent_frame.datos_reales[caravana] = {"dosis_recibidas": 0}
+                #self.parent_frame.datos_reales[caravana]["dosis_recibidas"] += 1
+                #self.parent_frame.actualizar_tabla()
+                def actualizar_contador(c=caravana):
+                    if c not in self.parent_frame.datos_reales:
+                        self.parent_frame.datos_reales[c] = {"dosis_recibidas": 0}
+                    self.parent_frame.datos_reales[c]["dosis_recibidas"] += 1
+                    self.parent_frame.actualizar_tabla()
+                self.parent_frame.after(0, actualizar_contador)
+                
         with open(archivo, "w", encoding="utf-8") as f:
             json.dump(datos_existentes, f, indent=4)
+        
 
+    
     def iniciar_recepcion_uart(self):
         hilo_uart = threading.Thread(target=self.leer_uart_y_guardar_json, daemon=True)
         hilo_uart.start()

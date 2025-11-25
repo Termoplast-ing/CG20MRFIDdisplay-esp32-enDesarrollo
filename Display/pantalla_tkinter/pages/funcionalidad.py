@@ -68,16 +68,21 @@ class FuncionalidadWindow(tk.Toplevel):
         self.bind("<Escape>", lambda e: self.cerrar_ventana())
 
         # Crear los frames para los elementos de funcionalidad
+        valor_motor, valor_agua, valor_caravana = self.cargar_calibraciones()
         self.frame_calibracion_motor = tk.Frame(self, bg='#EF9480', height=40)
         self.frame_calibracion_motor.pack(side=tk.TOP, fill="x", pady=5)
-        self.crear_calibracion_motor(self.frame_calibracion_motor)
+        #agrego esto nuevo
+        #valor_motor = self.cargar_configuracion_motor()
+        #modifico y agrego valor_inicial, posiblemente se borra de vuelta
+        self.crear_calibracion_motor(self.frame_calibracion_motor, valor_inicial=valor_motor)
+        
         self.frame_calibracion_agua = tk.Frame(self, bg='#EF9480', height=40)
         self.frame_calibracion_agua.pack(side=tk.TOP, fill="x", pady=5)
-        self.crear_calibracion_agua(self.frame_calibracion_agua)
+        self.crear_calibracion_agua(self.frame_calibracion_agua, valor_inicial=valor_agua)
         # Crear el slider para "Caravana Desconocida"
         self.frame_caravana_desconocida = tk.Frame(self, bg='#EF9480', height=40)
         self.frame_caravana_desconocida.pack(side=tk.TOP, fill="x", pady=5)
-        self.crear_slider_caravana(self.frame_caravana_desconocida)
+        self.crear_slider_caravana(self.frame_caravana_desconocida, valor_inicial=valor_caravana)
         # Frame para el selector de caravanas
         self.frame_caravanas_libres = tk.Frame(self, bg='#EF9480', height=40)
         self.frame_caravanas_libres.pack(side=tk.TOP, fill="x", pady=5)
@@ -99,6 +104,22 @@ class FuncionalidadWindow(tk.Toplevel):
         # Botón "Guardar"
         boton_guardar = tk.Button(self.frame_botones_finales, text="Guardar", font=("Helvetica", 16), command=self.guardar, bg="red", fg="#ffffff", bd=7)
         boton_guardar.pack(side=tk.RIGHT, padx=10)
+        
+    def cargar_calibraciones(self):
+        try:
+            config_path = os.path.join("config", "configuracion_sistema.json")
+            if not os.path.exists(config_path):
+                return 0, 0, 0.0
+            with open(config_path, 'r') as f:
+                data = json.load(f)
+            motor = data.get("calibraciones", {}).get("motor", 0)
+            agua = data.get("calibraciones", {}).get("agua", 0)
+            caravana = float(data.get("calibraciones", {}).get("peso", 0.0))
+            return motor, agua, caravana
+            #return data.get("calibraciones", {}).get("motor", 0)
+        except Exception as e:
+            print("Error al cargar calibraciones:", e)
+            return 0, 0, 0.0
 
     def crear_logo(self):
         """Función para crear y ubicar el logo en un frame dado"""
@@ -107,7 +128,7 @@ class FuncionalidadWindow(tk.Toplevel):
         label = tk.Label(self.frame_logo, image=self.master.logo, bg='#EF9480')
         label.place(relx=0.5, rely=0.5, anchor="center")
     
-    def crear_calibracion_motor(self, frame):
+    def crear_calibracion_motor(self, frame, valor_inicial=0):
         """Función para crear los controles de calibración del motor con botones + y -"""
         frame_superior_motor = tk.Frame(frame, bg='#EF9480')
         frame_superior_motor.pack(side=tk.TOP, pady=10, anchor='w')
@@ -116,7 +137,9 @@ class FuncionalidadWindow(tk.Toplevel):
         label_motor = tk.Label(frame_superior_motor, text="Calibración Motor:", font=("Helvetica", 14), bg='#EF9480', fg="black")
         label_motor.pack(side=tk.LEFT, padx=20)
         # Variables para manejar el valor de calibración del motor
-        self.var_calibracion_motor = tk.IntVar(value=0)  # Valor inicial del motor
+        
+        #modifico esto value=0.
+        self.var_calibracion_motor = tk.IntVar(value=valor_inicial)  # Valor inicial del motor
         # Crear botones para disminuir y aumentar el valor de calibración
         frame_botones_motor = tk.Frame(frame_superior_motor, bg='#EF9480')
         frame_botones_motor.pack(side=tk.LEFT)
@@ -128,7 +151,7 @@ class FuncionalidadWindow(tk.Toplevel):
         boton_aumentar_motor = tk.Button(frame_botones_motor, text="+", font=("Helvetica", 16), command=lambda: self.modificar_calibracion(self.var_calibracion_motor, 1), bg="#F2B1A1", fg="black", bd=5)
         boton_aumentar_motor.pack(side=tk.LEFT)
                
-    def crear_calibracion_agua(self, frame):
+    def crear_calibracion_agua(self, frame,valor_inicial=0 ):
         """Función para crear los controles de calibración de agua con botones + y -"""
         frame_superior_agua = tk.Frame(frame, bg='#EF9480')
         frame_superior_agua.pack(side=tk.TOP, pady=6, anchor='w')
@@ -137,7 +160,7 @@ class FuncionalidadWindow(tk.Toplevel):
         label_agua = tk.Label(frame_superior_agua, text="Calibración Agua:", font=("Helvetica", 14), bg='#EF9480', fg="black")
         label_agua.pack(side=tk.LEFT, padx=22)
         # Variables para manejar el valor de calibración del agua
-        self.var_calibracion_agua = tk.IntVar(value=0)
+        self.var_calibracion_agua = tk.IntVar(value=valor_inicial)
 
         # Crear botones para disminuir y aumentar el valor de calibración
         frame_botones_agua = tk.Frame(frame_superior_agua, bg='#EF9480')
@@ -151,7 +174,7 @@ class FuncionalidadWindow(tk.Toplevel):
         boton_aumentar_agua = tk.Button(frame_botones_agua, text="+", font=("Helvetica", 16), command=lambda: self.modificar_calibracion(self.var_calibracion_agua, 1), bg="#F2B1A1", fg="black", bd=5)
         boton_aumentar_agua.pack(side=tk.LEFT)
 
-    def crear_slider_caravana(self, frame):
+    def crear_slider_caravana(self, frame,valor_inicial):
         """Función para crear el slider de "Caravana Desconocida" con un estilo similar al slider en ir_dieta.py"""
         frame_slider_caravana = tk.Frame(frame, bg='#EF9480')
         frame_slider_caravana.pack(side=tk.TOP, pady=10, anchor="w")
@@ -160,25 +183,26 @@ class FuncionalidadWindow(tk.Toplevel):
         label_caravana = tk.Label(frame_slider_caravana, text="Caravana/Desc:", font=("Helvetica", 14), bg='#EF9480', fg="black")
         label_caravana.pack(side=tk.LEFT, padx=20)
         # Variable para manejar el valor del slider
-        self.var_caravana_desconocida = tk.DoubleVar(value=0.0)  # Valor inicial del slider
+        self.var_caravana_desconocida = tk.DoubleVar(value=valor_inicial)  # Valor inicial del slider
 
         # Crear el slider con un diseño similar al de ir_dieta.py
-        self.slider_caravana = tk.Scale(frame_slider_caravana, from_=0, to=5, orient="horizontal", variable=self.var_caravana_desconocida, resolution=0.1, length=200, sliderlength=20, troughcolor="grey", bg='#c7baba', activebackground='#F2B1A1', font=("Helvetica", 12), highlightbackground='#000000',highlightthickness=2)
+        self.slider_caravana = tk.Scale(frame_slider_caravana, from_=0, to=5, orient="horizontal",variable=self.var_caravana_desconocida, resolution=0.1, length=200, sliderlength=20, troughcolor="grey", bg='#c7baba', activebackground='#F2B1A1', font=("Helvetica", 12), highlightbackground='#000000', highlightthickness=2)
         self.slider_caravana.pack(side=tk.LEFT, padx=0)
         # Crear un frame para la etiqueta del valor
-        frame_inferior = tk.Frame(frame, bg='#EF9480')
-        frame_inferior.pack(side=tk.TOP, pady=5)
+        #frame_inferior = tk.Frame(frame, bg='#EF9480')
+        #frame_inferior.pack(side=tk.TOP, pady=5)
 
         # Crear una etiqueta para mostrar el valor con unidades
-        self.label_slider_caravana = tk.Label(frame_inferior, text="0.0 kg", font=("Helvetica", 14), bg='#EF9480', fg="black")
-        self.label_slider_caravana.pack(side=tk.TOP)
+        #self.label_slider_caravana = tk.Label(frame_inferior, text="0.0 kg", font=("Helvetica", 14), bg='#EF9480', fg="black")
+        #self.label_slider_caravana.pack(side=tk.TOP)
         # Actualizar el valor mostrado en el label cada vez que se mueva el slider
-        self.slider_caravana.bind("<Motion>", self.actualizar_label_caravana)
+        #self.slider_caravana.bind("<Motion>", self.actualizar_label_caravana)
 
     def actualizar_label_caravana(self, event):
         """Actualizar el valor del label cuando se mueve el slider"""
-        valor = self.var_caravana_desconocida.get()
-        self.label_slider_caravana.config(text=f"Valor: {valor:.1f} kg")
+        #valor = self.var_caravana_desconocida.get()
+        #valor= float(event)
+        #self.label_slider_caravana.config(text=f"Valor: {valor:.1f} kg")
 
     def crear_caravanas_libres(self, frame):
         """Función para crear y ubicar el selector de caravana en un frame dado"""
@@ -233,7 +257,7 @@ class FuncionalidadWindow(tk.Toplevel):
             mostrar_mensaje(self, "Error", "La caravana debe tener exactamente 15 dígitos", "error")
             return
             
-        if len(self.lista_caravanas_libres) >5:
+        if len(self.lista_caravanas_libres) >= 5:
             mostrar_mensaje(self, "Limite alcanzado", "Solo se pueden ingresar hasta 5 caravanas", "warning")
             return
 
@@ -262,7 +286,7 @@ class FuncionalidadWindow(tk.Toplevel):
     def crear_indice_corporal(self, frame):
         """Función para crear y ubicar el selector de índice corporal en un frame dado"""
         # Opciones para el índice corporal y los porcentajes
-        self.opciones_indice = ['','gorda', 'flaca', 'mediana', 'enferma']
+        self.opciones_indice = ['Gorda 50%', 'Normal 100%', 'Flaca 200%']
         self.opciones_porcentajes = [f"{i}%" for i in range(1, 201)]
 
         # Frame para los selectores y botones
@@ -297,10 +321,10 @@ class FuncionalidadWindow(tk.Toplevel):
         frame_botones = tk.Frame(frame_selectores, bg='#EF9480')
         frame_botones.pack(side=tk.LEFT)
         # Botón para agregar una nueva opción
-        boton_agregar = tk.Button(frame_botones, text="+", font=("Helvetica", 12), command=self.agregar_opcion, bg="#F2B1A1", fg="black", bd=3)
+        boton_agregar = tk.Button(frame_botones, text="+", font=("Helvetica", 12), state="disable", bg="#F2B1A1", fg="black", bd=3)
         boton_agregar.pack(side=tk.LEFT, padx=5)
         # Botón para eliminar una opción
-        boton_eliminar = tk.Button(frame_botones, text="-", font=("Helvetica", 12), command=self.eliminar_opcion,  bg="#F2B1A1", fg="black", bd=3)
+        boton_eliminar = tk.Button(frame_botones, text="-", font=("Helvetica", 12), state="disable",  bg="#F2B1A1", fg="black", bd=3)
         boton_eliminar.pack(side=tk.LEFT, padx=5)
 
     def mostrar_teclado_porcentaje(self, event):
@@ -402,7 +426,7 @@ class FuncionalidadWindow(tk.Toplevel):
         frame_botones = tk.Frame(frame_selectores, bg='#EF9480')
         frame_botones.pack(side=tk.LEFT)
         # Botón para agregar una nueva curva (abrir ventana de curva)
-        boton_agregar = tk.Button(frame_botones, text="+", font=("Helvetica", 12), command=self.abrir_curva_alimentacion, bg="#F2B1A1", fg="black", bd=3)
+        boton_agregar = tk.Button(frame_botones, text="+", font=("Helvetica", 12), command=self.agregar_opcion, bg="#F2B1A1", fg="black", bd=3)
         boton_agregar.pack(side=tk.LEFT, padx=5)
         # Botón para eliminar una curva
         boton_eliminar = tk.Button(frame_botones,  text="-", font=("Helvetica", 12), state="disabled", bg="#F2B1A1", fg="black", bd=3)

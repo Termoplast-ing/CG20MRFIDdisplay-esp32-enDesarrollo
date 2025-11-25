@@ -12,6 +12,7 @@ class WifiHoraWindow(tk.Toplevel):
     def __init__(self, master, configuracion_window):
         super().__init__(master)
         self.master = master
+        self.master_panel_ref = self.master.master
         self.configuracion_window = configuracion_window
         self.overrideredirect(True)
         util_ventana.centrar_ventana(self, 480, 800)
@@ -174,6 +175,13 @@ class WifiHoraWindow(tk.Toplevel):
         hora = self.hora_seleccionada.get()
         if fecha and hora:
             self.enviar_timestamp(fecha, hora)
+            fecha_hora_str = f"{fecha} {hora}"
+            dt = datetime.datetime.strptime(fecha_hora_str, "%Y-%m-%d %H:%M")
+            #dt += datetime.timedelta(hours=1)
+            self.master_panel_ref.forzar_hora(dt)
+            #self.master.actualizar_reloj()
+            #self.master.label_reloj.config(text=dt.strftime("%d/%m/%Y"))
+            #self.master.label_hora.config(text=dt.strftime("%H:%M")) 
         else:
             print("Debes seleccionar fecha y hora antes de sincronizar.")
             
@@ -181,13 +189,14 @@ class WifiHoraWindow(tk.Toplevel):
         try:
             fecha_hora_str = f"{fecha_str} {hora_str}"
             dt = datetime.datetime.strptime(fecha_hora_str, "%Y-%m-%d %H:%M")
+            #dt += datetime.timedelta(hours=1)
             timestamp = int(dt.timestamp())
             json_timestamp = json.dumps({"timestamp": timestamp})
             mensaje = f"<<<{json_timestamp}>>>"
             ser = serial.Serial('/dev/serial0', 9600, timeout=1)
             ser.write(mensaje.encode())
             ser.close()
-            print("Timestamp enviado:", timestamp)
+            print("Timestamp enviado (+1h):", timestamp)
             print("JSON enviado:", mensaje)
         except Exception as e:
             print("Error al enviar timestamp:", e)

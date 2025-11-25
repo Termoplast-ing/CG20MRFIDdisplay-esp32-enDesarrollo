@@ -23,10 +23,10 @@ def cargar_todas_curvas():
         
 def obtener_lista_curvas():
     curvas_guardadas = cargar_todas_curvas()
-    curvas_nuevas = [c["nombre"] for c in curvas_guardadas if c["nombre"].lower() not in ["curva1","curva2","curva3"]]
+    curvas_nuevas = [c["nombre"] for c in curvas_guardadas if c["nombre"].lower() not in ["Ascendente","Constante","Descendente","Forma V"]]
     lista_final = ['']
     lista_final.extend(curvas_nuevas)
-    lista_final.extend(["curva1", "curva2", "curva3"])
+    lista_final.extend(["Ascendente","Constante","Descendente","Forma V"])
     return lista_final
 
 def existe_curva(nombre):
@@ -282,13 +282,13 @@ class CurvaAlimentacionWindow(tk.Toplevel):
             
         curvas_existentes = cargar_todas_curvas()
         
-        nombre_bloqueado = config_name.strip().lower() in ["curva 1", "curva 2", "curva 3"]
+        nombre_bloqueado = config_name.strip().lower() in ["Ascendente","Constante","Descendente","Forma V"]
         if nombre_bloqueado:
-            mostrar_mensaje(self, "Error", "no se puede modificar Curva 1,2 o 3", "error")
+            mostrar_mensaje(self, "Error", "no se puede modificar Curva 1,2 , 3 o 4", "error")
             return
             
         curva_existente = next((c for c in curvas_existentes if c["nombre"].lower() == config_name.lower()), None)
-        curvas_nuevas = [c for c in curvas_existentes if c["nombre"].strip().lower().replace(" ", "") not in ["curva1", "curva2", "curva3"]]
+        curvas_nuevas = [c for c in curvas_existentes if c["nombre"].strip().lower().replace(" ", "") not in ["Ascendente","Constante","Descendente","Forma V"]]
         if not curva_existente and len(curvas_nuevas) >= 2:
             mostrar_mensaje(self, "Error", "Solo se pueden agregar hasta 2 curvas personalizadas.", "error")
             return

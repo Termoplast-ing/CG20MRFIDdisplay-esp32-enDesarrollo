@@ -55,6 +55,11 @@ class DatosWindow(tk.Toplevel):
 
         # Cargar datos animales desde JSON
         self.datos_animales = self.cargar_datos_animales()
+        
+        #agrego esto nuevo
+        self.datos_reales = self.cargar_datos_reales()
+        #esto otro es nuevo 08/10/2025
+        #self.datos_semaforo = self.cargar_datos_semaforo()
 
         # Dibujar tabla inicial con datos del corral seleccionado
         self.dibujar_tabla()
@@ -127,7 +132,7 @@ class DatosWindow(tk.Toplevel):
             caravana = animal[0] if len(animal) > 0 else ""
             interno = animal[1] if len(animal) > 1 else ""
             inseminacion_str = animal[2] if len(animal) > 2 else ""
-            dosis = animal[7] if len(animal) > 7 else 0
+            #dosis = animal[7] if len(animal) > 7 else 0
 
             # Calcular día del ciclo (1 a 113)
             try:
@@ -140,10 +145,22 @@ class DatosWindow(tk.Toplevel):
                     delta_dias = 113
             except Exception:
                 delta_dias = ""
+            
+            peso_dosis = (animal[6] if len(animal) > 6 else 0.0) / 10
+            cantidad_dosis =int(animal[7]) if len(animal) > 7 else 1
+            peso_por_dosis = peso_dosis / cantidad_dosis
+            #peso_acumulado = peso_dosis * dosis * delta_dias
+            # Obtener cantidad real de dosis aplicadas desde datos_reales.json
+            
+            #Probamos esto nuevo 27/10
+            dosis_real = 0
+            if caravana in self.datos_reales:
+                dosis_real = self.datos_reales[caravana].get("dosis_recibidas", 0)
+            #dosis_real = 1 if caravana in self.datos_reales else 0
 
-            peso_dosis = animal[6] if len(animal) > 6 else 0.0
-            peso_acumulado = peso_dosis * dosis * delta_dias
-
+            # Calcular peso acumulado real
+            peso_acumulado = peso_por_dosis * dosis_real
+            
             datos = [
                 caravana,
                 interno,
@@ -171,7 +188,7 @@ class DatosWindow(tk.Toplevel):
                     espacio = 25
                     circle_start_x = texto_x + 70
                     circle_y = texto_y + 7
-                    for i in range(dosis):
+                    for i in range(dosis_real):
                         circle = self.canvas.create_oval(
                             circle_start_x + i * espacio - circle_radius,
                             circle_y - circle_radius,
@@ -181,10 +198,24 @@ class DatosWindow(tk.Toplevel):
                             outline="black"
                         )
                     # Mostrar peso de la dosis debajo de los círculos
-                    self.canvas.create_text(texto_x, texto_y + 15, text=f"{peso_dosis:.2f} kg", anchor="w", font=("Helvetica", 10))
+                    peso_total_real = peso_por_dosis * dosis_real
+                    self.canvas.create_text(texto_x, texto_y + 15, text=f"{peso_por_dosis:.2f} kg", anchor="w", font=("Helvetica", 10))
                 elif col_idx in [5, 6, 7]:
+                    # esto otro es lo nuevo 08/10/2025
+                    #from datetime import datetime, timedelta
+                    #hoy = datetime.now().date()
+                    #dias_atras = col_idx - 4
+                    #fecha_ref = (hoy - timedelta(days=dias_atras)).strftime("%Y-%m-%d")
                     # Simulación de estado alimentación: 0 = no comió (rojo), 1 = comió parcialmente (amarillo), 2 = comió todo (verde)
                     estado = 0  # Por defecto rojo (no comió)
+                    # esto otro es lo nuevo 08/10/2025
+                    #if dosis_en_dia ==0:
+                    #    estado = 0 #rojo
+                    #elif dosis_en_dia < cantidad_dosis:
+                    #    estado = 1 # amarillo
+                    #else:
+                    #    estado = 2 # verde
+                        
                     color = "#e74c3c" if estado == 0 else "#f1c40f" if estado == 1 else "#27ae60"
                     circle_radius = 10
                     circle_x = x + w / 2
@@ -199,12 +230,65 @@ class DatosWindow(tk.Toplevel):
                         width=1
                     )
                 else:
-                    # Texto centrado en las demás celdas
+                    # Texto centrado en las demás celdas/ camie: text=valor
                     self.canvas.create_text(x + w/2, y + row_height/2, text=valor, anchor="center", font=("Helvetica", 10))
 
                 x += w
+    #agrego esta funcion nueva  / Modificacion 10/11
+    def cargar_datos_reales(self):
+        ruta_json = os.path.join(os.getcwd(), "datos_reales.json")
+        datos_dosis = {}
+        #hoy = datetime().strftime("%Y-%m-%d")
+        try:
+            with open(ruta_json, "r", encoding="utf-8") as f:
+                datos_json = json.load(f)
+
+            for timestamp, corrales in datos_json.items():
+                #if timestamp != hoy:
+                #    continue
+                for corral, registros in corrales.items():
+                    for registro in registros:
+                        caravana = registro.get("caravana")
+                        if caravana:
+                            if caravana not in datos_dosis:
+                                datos_dosis[caravana] = {"dosis_recibidas": 0}
+                            datos_dosis[caravana]["dosis_recibidas"] += 1
+
+            return datos_dosis
+
+        except Exception as e:
+            print(f"Error al cargar datos_reales.json: {e}")
+            return {}
+            
+    #esto otro es nuevo 08/10/2025
+    #def cargar_datos_semaforo(self):
+    #    from datetime import datetime
+    #    ruta_json =os.path.join(os.getcwd(), "datos_reales.json")
+    #    datos_fechas = {}
+    #    try:
+    #        with open(ruta_json, "r", encoding="utf-8") as f:
+    #            datos_json = json.load(f)
+    #    
+    #        for timestamp,corrales in datos_json.items():
+    #            for corral, registros in corrales.items():
+    #                for registro in registros:
+    #                    caravana = registro.get("caravana")
+    #                    ts = registro.get("timestamp", timestamp)
+    #                    try:
+    #                        fecha = datetime.fromtimestamp(int(ts)).strftime("%Y-%m-%d")
+    #                    except Exception:
+    #                        continue
+    #                    if caravana:
+    #                        datos_fechas.setdefault(caravana, []).append(fecha)
+    #        return datos_fechas
+    #    except Exception as e:
+    #        print(f"Error al cargar datos para semaforo: {e}")
+    #        return {}
 
     def actualizar_tabla(self):
+        self.datos_reales = self.cargar_datos_reales()
+        #esto otro es nuevo 08/10/2025
+        #self.datos_semaforo = self.cargar_datos_semaforo()
         self.dibujar_tabla()
 
     def cerrar_ventana(self):

@@ -167,6 +167,11 @@ class GestionAnimalWindow(tk.Toplevel):
         # Si el N° Interno no se ingresa, se guarda como una cadena vacía
         if not interno:
             interno = ""
+            
+        for animal in self.animales_por_corral[corral]:
+            if animal[0] == caravana:
+                self.mostrar_mensaje("Error", f"Ya existe un animal con N° Caravana {caravana} en este corral.")
+                return
 
         # Crear una nueva fila con los datos (9 valores)
         nuevo_animal = [

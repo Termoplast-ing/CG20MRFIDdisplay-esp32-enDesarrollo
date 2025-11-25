@@ -12,11 +12,15 @@ from pages.menu_inferior import MenuInferiorWindow
 from pages.wifi_hora import WifiHoraWindow
 from util.util_calendario import seleccionar_fecha
 import time
-from datetime import datetime
+import threading
+import subprocess
+from datetime import datetime, timedelta
 
 class MasterPanel(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.hora_manual = None
+        self.datos_reales = {}
         self.logo = util_img.leer_imagen('./imagenes/Logo_negro.png',(300,100))   #240,75
         self.config(bg="#EF9480")
         self.config_windows()
@@ -107,6 +111,30 @@ class MasterPanel(tk.Tk):
         self.grid_rowconfigure(2, weight=0)  # Fila inferior (menú)
         self.grid_rowconfigure(3, weight=0)  # Fila reloj
         self.grid_columnconfigure(0, weight=1)  # Columna única
+        
+    #Esta es la ultima funcion que agregamos
+    def modal_animal(self, caravana):
+        #if caravana:
+        #    if caravana not in self.datos_reales:
+        #        self.datos_reales[caravana] = {"dosis_recibidas": 0}
+        #    self.datos_reales[caravana]["dosis_recibidas"] += 1
+            
+        popup = tk.Toplevel(self)
+        popup.overrideredirect(True)  # Sin barra de título
+        popup.configure(bg="red",bd=3, relief="solid")
+
+    # Centrar el modal respecto a la ventana principal
+        w, h = 475,200
+        x = self.winfo_x() + (self.winfo_width() // 2) - (w // 2)
+        y = self.winfo_y() + (self.winfo_height() // 2) - (h // 2)
+        popup.geometry(f"{w}x{h}+{x}+{y}")
+
+        label = tk.Label(popup, text=f"Animal leído:\n\n{caravana}", font=("Helvetica", 20, "bold"), fg="white", bg="red")
+        label.pack(expand=True, fill="both", padx=20, pady=20)
+
+        popup.lift()
+        popup.attributes("-topmost", True)
+        popup.after(3500, popup.destroy) 
 
     def abrir_calendario(self):
         self.lift()
@@ -117,13 +145,43 @@ class MasterPanel(tk.Tk):
         fecha = self.variable_fecha.get()
         if fecha:
             self.frame_estaciones.filtrar_por_fecha(fecha)
+
+    def forzar_hora(self, dt):
+        self.hora_manual = dt
+        #fecha_actual = self.hora_manual.strftime("%d/%m/%Y")
+        #hora_actual = self.hora_manual.strftime("%H:%M")
+        self.label_reloj.config(text=fecha_actual)
+        self.label_hora.config(text=hora_actual)
+        # cambiamos self.hora_manual.strftime ("%Y-%m-%d %H:%M:%S"
+        threading.Thread(
+            target=lambda: subprocess.run(
+                ["sudo", "/usr/bin/date", "-s", self.hora_manual.strftime("%Y-%m-%d %H:%M:%S")],
+                check=True
+            ),
+            daemon=True
+        ).start()
+        #comentamos esta 2 lineas:
+        #self.hora_manual = None
+        self.after(200, self.actualizar_reloj)
+        #self.after(2000, self.desactivar_hora_manual)
+    
+    #def desactivar_hora_manual(self):
+     #   self.hora_manual = None
+    
     def actualizar_reloj(self):
-        fecha_actual = datetime.now().strftime("%d/%m/%Y")
-        hora_actual = datetime.now().strftime("%H:%M")
+        #comentamos todo el if
+        if self.hora_manual:
+            self.hora_manual += timedelta(seconds=1)    
+            fecha_actual = self.hora_manual.strftime("%d/%m/%Y")
+            hora_actual = self.hora_manual.strftime("%H:%M")
+        else:
+            fecha_actual = datetime.now().strftime("%d/%m/%Y")
+            hora_actual = datetime.now().strftime("%H:%M")
+            
         self.label_reloj.config(text=fecha_actual)
         self.label_hora.config(text=hora_actual)
         self.after(1000, self.actualizar_reloj)
-
+    
     def on_enter(self, event):
         """Función para cambiar el color cuando el ratón entra en el botón"""
         event.widget.config(bg="red")  # Cambiar el color de fondo cuando el ratón pasa sobre el botón

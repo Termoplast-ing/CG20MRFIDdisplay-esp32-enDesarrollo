@@ -91,7 +91,7 @@ class ir_dietaWindow(tk.Toplevel):
 
     def crear_selector_curva(self, frame):
         """Función para crear y ubicar el selector de tipo de curva en un frame dado"""
-        tipos_curva = ['Gorda', 'Flaca', 'Mediana', 'Enferma']  # Los tipos de curvas disponibles
+        tipos_curva = ['Ascendente', 'Constante', 'Descendente', 'Forma V']  # Los tipos de curvas disponibles
         label_curva = tk.Label(frame, text="Tipo de Curva:", font=("Helvetica", 14), bg='#EF9480', fg="black")
         label_curva.pack(side=tk.LEFT, padx=20)
 
@@ -102,7 +102,7 @@ class ir_dietaWindow(tk.Toplevel):
 
     def crear_indice_corporal(self, frame):
         """Función para crear y ubicar el selector de índice corporal en un frame dado"""
-        indice_corporal = ['Bajo (50%)', 'Normal (100%)', 'Alto (200%)']  # Los índices corporales disponibles
+        indice_corporal = ['Gorda (50%)', 'Normal (100%)', 'Flaca (200%)']  # Los índices corporales disponibles
         label_indice = tk.Label(frame, text="Índice Corporal:", font=("Helvetica", 14), bg='#EF9480', fg="black")
         label_indice.pack(side=tk.LEFT, padx=21)
 
