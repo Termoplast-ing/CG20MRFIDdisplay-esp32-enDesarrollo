@@ -434,22 +434,3 @@ def obtenerFechasInseminacion():
     filas = cur.fetchall()
     conn.close()
     return {car: fecha for car, fecha in filas}
-
-# prueba tabla datos
-
-def ingreso_animal():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """INSERT INTO animal (intervalo, pesoTotal, cantidadDosis, tirarAgua,
-         descripcion, caravana, numeroInterno, fechaInseminacion,
-         IdIndiceCorporal, idTipoCurva, corral)
-         VALUES (12, 150.0, 3, 1, 'Dieta de prueba', '123456789', 1,
-         '2024-01-15', 1, 1, 1)"""
-    )
-    conn.commit()
-    conn.close()
-
-#def borrar_tablas():
-
-print("commit")

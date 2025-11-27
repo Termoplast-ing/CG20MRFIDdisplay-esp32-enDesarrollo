@@ -3,6 +3,7 @@ from tkinter import messagebox
 import util.util_ventana as util_ventana
 from util.teclado import TecladoWindow
 from util.util_mensaje import mostrar_mensaje
+from util import sqlite as db_local
 
 class LoginWindow(tk.Toplevel):
     def __init__(self, master):
