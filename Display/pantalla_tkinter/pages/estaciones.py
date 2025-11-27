@@ -85,7 +85,7 @@ class Estaciones:
     def cargar_fechas_inseminacion(self):
         """
         Antes leía datos_animales.json.
-        Ahora usa la tabla 'dieta' para obtener {caravana: fechaInseminacion}.
+        Ahora usa la tabla 'animal' para obtener {caravana: fechaInseminacion}.
         """
         try:
             return db_local.obtenerFechasInseminacion()

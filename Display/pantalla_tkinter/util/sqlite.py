@@ -435,7 +435,7 @@ def obtenerFechasInseminacion():
     conn.close()
     return {car: fecha for car, fecha in filas}
 
-# prueba datos
+# prueba tabla datos
 
 def ingreso_animal():
     conn = get_connection()
@@ -449,3 +449,6 @@ def ingreso_animal():
     )
     conn.commit()
     conn.close()
+
+#def borrar_tablas():
+
