@@ -325,7 +325,6 @@ class GestionAnimalWindow(tk.Toplevel):
         self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def mostrar_mensaje(self,titulo, texto, tipo="error"):
-        """Muestra mensajes con borde negro grueso y estilo mejorado"""
         mostrar_mensaje(self, titulo, texto, tipo)
 
     

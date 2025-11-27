@@ -189,11 +189,6 @@ class Estaciones:
     # ------------------- FILTRO POR FECHA (si lo usás) -------------------
 
     def filtrar_por_fecha(self, fecha):
-        """
-        Si en algún momento querés filtrar por fecha concreta.
-        Ojo: ahora las fechas de pesaje vienen de SQLite en formato 'YYYY-MM-DD'.
-        Este método lo dejo casi igual, pero apoyado en cargar_datos_db().
-        """
         try:
             fecha_convertida = datetime.strptime(fecha, "%Y-%m-%d").strftime("%Y-%m-%d")
         except ValueError:

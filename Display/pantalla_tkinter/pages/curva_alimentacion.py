@@ -8,8 +8,6 @@ from util.teclado import TecladoWindow
 from util import sqlite as db_local 
 
 
-# ==== helpers para otras pantallas (combos, etc.) =====================
-
 def obtener_lista_curvas():
     return db_local.obtenerCurvas()
 
@@ -104,7 +102,6 @@ class CurvaAlimentacionWindow(tk.Toplevel):
         )
         self.boton_eliminar_segmento.pack(side=tk.RIGHT, padx=10, pady=5)
 
-        # ===== Botones Guardar / Atrás =====
         self.frame_botonera2 = tk.Frame(self, bg="#EF9480")
         self.frame_botonera2.pack(side=tk.BOTTOM, fill="x", pady=(10, 60))
 
@@ -228,7 +225,6 @@ class CurvaAlimentacionWindow(tk.Toplevel):
             return 2
 
     def validar_indice(self, texto):
-        """Número entre 0 y 200 (con o sin %)."""
         if texto == "":
             return True
         if texto.endswith('%'):
@@ -420,6 +416,6 @@ class CurvaAlimentacionWindow(tk.Toplevel):
             )
         else:
             mostrar_mensaje(self, "Error", message, "error")
-
+            
     def cerrar_ventana(self):
         self.destroy()

@@ -17,7 +17,6 @@ class DatosWindow(tk.Toplevel):
         self.frame_logo.pack(side=tk.TOP, fill="x", pady=10)
         self.crear_logo(self.frame_logo)
 
-        # ===== Frame para selector de corral =====
         self.frame_selector = tk.Frame(self, bg="#EF9480", height=40)
         self.frame_selector.pack(side=tk.TOP, fill="x", pady=(0, 5))
 
@@ -114,7 +113,6 @@ class DatosWindow(tk.Toplevel):
         # Limpiar canvas
         self.canvas.delete("all")
 
-        # ==== Encabezados ====
         x = start_x
         for idx, header in enumerate(headers):
             w = col_widths[idx]
@@ -131,7 +129,6 @@ class DatosWindow(tk.Toplevel):
             )
             x += w
 
-        # Obtener corral seleccionado
         corral_seleccionado = self.combo_corral.get()  # "Corral 3"
         try:
             num_corral = int(corral_seleccionado.split()[-1])
@@ -146,7 +143,6 @@ class DatosWindow(tk.Toplevel):
         ancho_canvas = sum(col_widths)
         self.canvas.config(scrollregion=(0, 0, ancho_canvas, alto_canvas))
 
-        # ==== Filas ====
         for fila_idx, animal in enumerate(animales):
             # animal = (caravana, numeroInterno, fechaInseminacion, pesoTotal, cantidadDosis, intervalo)
             caravana = animal[0]
@@ -221,7 +217,6 @@ class DatosWindow(tk.Toplevel):
                             outline="black"
                         )
 
-                    # mostrar peso por dosis
                     self.canvas.create_text(
                         texto_x,
                         texto_y + 15,
