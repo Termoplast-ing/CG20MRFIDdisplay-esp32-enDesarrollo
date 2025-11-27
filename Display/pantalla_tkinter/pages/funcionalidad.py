@@ -41,7 +41,7 @@ def inicializar_curvas_fijas():
         {"nombre": "curva3", "segmentos": [{"dia": 1, "indice": "100%"}, {"dia": 113, "indice": "50%"}]}
     ]
     try:
-        curvas = curvas_alimentacion.cargar_todas_curvas()
+        curvas = curva_alimentacion.cargar_todas_curvas()
         nombres = {c["nombre"].strip().lower().replace(" ", "") for c in curvas}
         for f in curvas_fijas:
             key = f["nombre"].strip().lower().replace(" ", "")

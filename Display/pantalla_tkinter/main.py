@@ -8,19 +8,20 @@ import json
 import os
 import time
 import sqlite3 as sql
-
+from util import sqlite as db_local
 #def enviar_json(archivo_json):
 #    with open(archivo_json, "r") as archivo:
 #        contenido = archivo.read()
 #    ser.write(contenido.encode())
 #    ser.write(b'\n')
 #    time.sleep(1)
+
 def parcear_json_config(parsear):
         configuracion= json.loads(parsear)
         calibraciones=configuracion["calibraciones"]
         caravanas_libres=configuracion["caravanas_libres"]
         indice_corporal=configuracion["indice_corporal"]
-        curvas_alimentacion=configuracion["curvas_alimentacion"]
+        #curvas_alimentacion=configuracion["curvas_alimentacion"]
          
         config_data = {
             "calibraciones": {
@@ -156,6 +157,6 @@ def enviar_json_gestion(archivo_json):
 # mensaje = '<<<' + json.dumps(msjOK) + '>>>'
 # ser.write(mensaje.encode('utf-8'))
 # #ser.write(b"OK")
-# */
+db_local.crearTablas()
 App = MasterPanel()
 App.mainloop()

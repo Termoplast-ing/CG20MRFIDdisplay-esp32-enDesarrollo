@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import Scrollbar, ttk
-import json
-import os
+from datetime import datetime
 import util.util_ventana as util_ventana
+from util import sqlite as db_local
 
 class DatosWindow(tk.Toplevel):
     def __init__(self, master):
@@ -21,16 +21,24 @@ class DatosWindow(tk.Toplevel):
         self.frame_selector = tk.Frame(self, bg="#EF9480", height=40)
         self.frame_selector.pack(side=tk.TOP, fill="x", pady=(0, 5))
 
-        label_corral = tk.Label(self.frame_selector, text="Seleccionar Corral:", bg="#EF9480", font=("Helvetica", 16, "bold"))
+        label_corral = tk.Label(
+            self.frame_selector,
+            text="Seleccionar Corral:",
+            bg="#EF9480",
+            font=("Helvetica", 16, "bold")
+        )
         label_corral.pack(side=tk.LEFT, padx=10)
 
-        self.combo_corral = ttk.Combobox(self.frame_selector, values=[f"Corral {i}" for i in range(1, 21)])
+        self.combo_corral = ttk.Combobox(
+            self.frame_selector,
+            values=[f"Corral {i}" for i in range(1, 21)]
+        )
         self.combo_corral.current(0)
         self.combo_corral.pack(side=tk.LEFT, padx=5)
         self.combo_corral.bind("<<ComboboxSelected>>", self.actualizar_datos)
 
         # ===== Frame que contendrá canvas + scrollbars =====
-        self.frame_canvas = tk.Frame(self, bg="#EF9480", height=500)  # altura fija
+        self.frame_canvas = tk.Frame(self, bg="#EF9480", height=500)
         self.frame_canvas.pack(side=tk.TOP, fill="x", padx=10, pady=(0, 5))
 
         # Canvas y scroll vertical
@@ -40,38 +48,41 @@ class DatosWindow(tk.Toplevel):
         self.v_scroll = Scrollbar(self.frame_canvas, orient="vertical", command=self.canvas.yview)
         self.v_scroll.pack(side="right", fill="y")
 
-        total_filas = 20
-        altura_fila = 40
-        alto_canvas = altura_fila * (1 + total_filas)
-        ancho_canvas = 845
+        # Config inicial de scroll
+        self.canvas.configure(height=500, yscrollcommand=self.v_scroll.set)
 
-        self.canvas.configure(scrollregion=(0, 0, ancho_canvas, alto_canvas), height=500, yscrollcommand=self.v_scroll.set)
-
-        # Scroll horizontal flotante fuera del frame_canvas
+        # Scroll horizontal flotante
         self.h_scroll = Scrollbar(self, orient="horizontal", command=self.canvas.xview)
         self.h_scroll.place(in_=self.frame_canvas, relx=0, rely=1.0, relwidth=1.0, anchor="sw")
-
         self.canvas.configure(xscrollcommand=self.h_scroll.set)
 
-        # Cargar datos animales desde JSON
-        self.datos_animales = self.cargar_datos_animales()
-        
-        #agrego esto nuevo
-        self.datos_reales = self.cargar_datos_reales()
-        #esto otro es nuevo 08/10/2025
-        #self.datos_semaforo = self.cargar_datos_semaforo()
-
-        # Dibujar tabla inicial con datos del corral seleccionado
+        # Dibujar tabla inicial
         self.dibujar_tabla()
 
         # Frame botones abajo
         self.frame_botones = tk.Frame(self, bg="#EF9480", height=60)
         self.frame_botones.pack(side=tk.TOP, fill="x")
 
-        boton_atras = tk.Button(self.frame_botones, text="<< Atrás", font=("Helvetica", 16), command=self.cerrar_ventana, bg="red", fg="#ffffff", bd=7)
+        boton_atras = tk.Button(
+            self.frame_botones,
+            text="<< Atrás",
+            font=("Helvetica", 16),
+            command=self.cerrar_ventana,
+            bg="red",
+            fg="#ffffff",
+            bd=7
+        )
         boton_atras.pack(side=tk.LEFT, padx=10, pady=14)
 
-        btn_actualizar = tk.Button(self.frame_botones, text="Actualizar", font=("Helvetica", 16), command=self.actualizar_tabla, bg="red", fg="white", bd=7)
+        btn_actualizar = tk.Button(
+            self.frame_botones,
+            text="Actualizar",
+            font=("Helvetica", 16),
+            command=self.actualizar_tabla,
+            bg="red",
+            fg="white",
+            bd=7
+        )
         btn_actualizar.pack(side=tk.RIGHT, padx=10, pady=14)
 
         util_ventana.centrar_ventana(self, 480, 800)
@@ -80,116 +91,128 @@ class DatosWindow(tk.Toplevel):
         label = tk.Label(frame, image=self.master.logo, bg='#EF9480')
         label.place(relx=0.5, rely=0.5, anchor="center")
 
-    def cargar_datos_animales(self):
-        ruta_json = os.path.join(os.getcwd(), "datos_animales.json")
-        try:
-            with open(ruta_json, "r", encoding="utf-8") as f:
-                datos = json.load(f)
-            return datos
-        except Exception as e:
-            print(f"Error al cargar datos_animales.json: {e}")
-            return {}
-
     def actualizar_datos(self, event=None):
         self.dibujar_tabla()
 
     def dibujar_tabla(self):
-        headers = ["N° Caravana", "N° Interno", "Día Ciclo", "Peso Acumulado", "Proceso Peso", "Ant", "Ant -1", "Ant -2"]
+        headers = [
+            "N° Caravana",
+            "N° Interno",
+            "Día Ciclo",
+            "Peso Acumulado",
+            "Proceso Peso",
+            "Ant",
+            "Ant -1",
+            "Ant -2"
+        ]
         num_cols = len(headers)
-        col_widths = [120, 120, 70, 120, 200, 50, 50, 50]  # ancho de cada columna
+        col_widths = [120, 120, 70, 120, 200, 50, 50, 50]
         row_height = 40
         start_x = 0
         start_y = 0
 
-        # Limpiar canvas antes de dibujar
+        # Limpiar canvas
         self.canvas.delete("all")
 
-        # ==== Dibujar encabezados ====  
-        x = start_x  
-        for idx, header in enumerate(headers):  
-            w = col_widths[idx]  
-            self.canvas.create_rectangle(x, start_y, x + w, start_y + row_height, fill="#f0ad4e", width=3)  
-            self.canvas.create_text(x + w/2, start_y + row_height/2, text=header, anchor="center", font=("Helvetica", 10, "bold"))  
-            x += w  
+        # ==== Encabezados ====
+        x = start_x
+        for idx, header in enumerate(headers):
+            w = col_widths[idx]
+            self.canvas.create_rectangle(
+                x, start_y, x + w, start_y + row_height,
+                fill="#f0ad4e", width=3
+            )
+            self.canvas.create_text(
+                x + w / 2,
+                start_y + row_height / 2,
+                text=header,
+                anchor="center",
+                font=("Helvetica", 10, "bold")
+            )
+            x += w
 
         # Obtener corral seleccionado
-        corral_seleccionado = self.combo_corral.get()
-        animales = self.datos_animales.get(corral_seleccionado, [])
+        corral_seleccionado = self.combo_corral.get()  # "Corral 3"
+        try:
+            num_corral = int(corral_seleccionado.split()[-1])
+        except Exception:
+            num_corral = 1
 
-        # Ajustar scrollregion según cantidad de filas
+
+        animales = db_local.obtenerAnimalesPorCorral(num_corral)
+
+        # Ajustar scrollregion
         alto_canvas = row_height * (1 + len(animales)) + 20
         ancho_canvas = sum(col_widths)
         self.canvas.config(scrollregion=(0, 0, ancho_canvas, alto_canvas))
 
-        # ==== Dibujar filas ====
-        from datetime import datetime
-
+        # ==== Filas ====
         for fila_idx, animal in enumerate(animales):
+            # animal = (caravana, numeroInterno, fechaInseminacion, pesoTotal, cantidadDosis, intervalo)
+            caravana = animal[0]
+            interno = animal[1]
+            fecha_inseminacion = animal[2]
+            peso_total = animal[3] or 0.0
+            cantidad_dosis = animal[4] or 1
+
+
             y = start_y + row_height * (fila_idx + 1)
             x = start_x
 
-            # Extraer datos relevantes
-            caravana = animal[0] if len(animal) > 0 else ""
-            interno = animal[1] if len(animal) > 1 else ""
-            inseminacion_str = animal[2] if len(animal) > 2 else ""
-            #dosis = animal[7] if len(animal) > 7 else 0
-
-            # Calcular día del ciclo (1 a 113)
             try:
-                fecha_inseminacion = datetime.strptime(inseminacion_str, "%Y-%m-%d")
-                fecha_actual = datetime.now()
-                delta_dias = (fecha_actual - fecha_inseminacion).days + 1
+                fecha_ins = datetime.strptime(str(fecha_inseminacion), "%Y-%m-%d")
+                hoy = datetime.now()
+                delta_dias = (hoy - fecha_ins).days + 1
                 if delta_dias < 1:
                     delta_dias = 1
                 elif delta_dias > 113:
                     delta_dias = 113
             except Exception:
                 delta_dias = ""
-            
-            peso_dosis = (animal[6] if len(animal) > 6 else 0.0) / 10
-            cantidad_dosis =int(animal[7]) if len(animal) > 7 else 1
-            peso_por_dosis = peso_dosis / cantidad_dosis
-            #peso_acumulado = peso_dosis * dosis * delta_dias
-            # Obtener cantidad real de dosis aplicadas desde datos_reales.json
-            
-            #Probamos esto nuevo 27/10
-            dosis_real = 0
-            if caravana in self.datos_reales:
-                dosis_real = self.datos_reales[caravana].get("dosis_recibidas", 0)
-            #dosis_real = 1 if caravana in self.datos_reales else 0
+            peso_total_kg = peso_total / 10.0
+            peso_por_dosis = peso_total_kg / cantidad_dosis if cantidad_dosis else 0
 
-            # Calcular peso acumulado real
+            dosis_real = cantidad_dosis
             peso_acumulado = peso_por_dosis * dosis_real
-            
+
             datos = [
                 caravana,
                 interno,
                 delta_dias,
-                f"{peso_acumulado:.1f} kg",  # Peso Acumulado calculado
-                "",  # Proceso Peso (aquí se dibujarán los círculos)
-                0,  # Ant. (estado semáforo: 0=rojo)
-                0,  # Ant.-1 (estado semáforo: 0=rojo)
-                0,  # Ant.-2 (estado semáforo: 0=rojo)
+                f"{peso_acumulado:.1f} kg",
+                "",   # Proceso Peso (círculos)
+                0,    # Ant
+                0,    # Ant -1
+                0     # Ant -2
             ]
 
-            for col_idx, valor in enumerate(datos):  
-                w = col_widths[col_idx]  
-                # Dibujar celda  
-                self.canvas.create_rectangle(x, y, x + w, y + row_height, fill="#cacaca", width=3)  
+            for col_idx, valor in enumerate(datos):
+                w = col_widths[col_idx]
+                # celda
+                self.canvas.create_rectangle(
+                    x, y, x + w, y + row_height,
+                    fill="#cacaca", width=3
+                )
 
                 if col_idx == 4:
-                    # Dibujar el texto "dosis:" alineado a la izquierda dentro de la celda
-                    texto_x = x + 10  # margen izquierdo dentro de la celda
+                    # Texto "Dosis:"
+                    texto_x = x + 10
                     texto_y = y + row_height / 3
-                    self.canvas.create_text(texto_x, texto_y, text="Dosis:", anchor="w", font=("Helvetica", 10))
+                    self.canvas.create_text(
+                        texto_x,
+                        texto_y,
+                        text="Dosis:",
+                        anchor="w",
+                        font=("Helvetica", 10)
+                    )
 
-                    # Dibujar círculos según cantidad de dosis
+                    
                     circle_radius = 10
                     espacio = 25
                     circle_start_x = texto_x + 70
                     circle_y = texto_y + 7
                     for i in range(dosis_real):
-                        circle = self.canvas.create_oval(
+                        self.canvas.create_oval(
                             circle_start_x + i * espacio - circle_radius,
                             circle_y - circle_radius,
                             circle_start_x + i * espacio + circle_radius,
@@ -197,98 +220,45 @@ class DatosWindow(tk.Toplevel):
                             fill="#27ae60",
                             outline="black"
                         )
-                    # Mostrar peso de la dosis debajo de los círculos
-                    peso_total_real = peso_por_dosis * dosis_real
-                    self.canvas.create_text(texto_x, texto_y + 15, text=f"{peso_por_dosis:.2f} kg", anchor="w", font=("Helvetica", 10))
+
+                    # mostrar peso por dosis
+                    self.canvas.create_text(
+                        texto_x,
+                        texto_y + 15,
+                        text=f"{peso_por_dosis:.2f} kg",
+                        anchor="w",
+                        font=("Helvetica", 10)
+                    )
+
                 elif col_idx in [5, 6, 7]:
-                    # esto otro es lo nuevo 08/10/2025
-                    #from datetime import datetime, timedelta
-                    #hoy = datetime.now().date()
-                    #dias_atras = col_idx - 4
-                    #fecha_ref = (hoy - timedelta(days=dias_atras)).strftime("%Y-%m-%d")
-                    # Simulación de estado alimentación: 0 = no comió (rojo), 1 = comió parcialmente (amarillo), 2 = comió todo (verde)
-                    estado = 0  # Por defecto rojo (no comió)
-                    # esto otro es lo nuevo 08/10/2025
-                    #if dosis_en_dia ==0:
-                    #    estado = 0 #rojo
-                    #elif dosis_en_dia < cantidad_dosis:
-                    #    estado = 1 # amarillo
-                    #else:
-                    #    estado = 2 # verde
-                        
+                    # Semáforo (por ahora fijo en rojo)
+                    estado = 0  # 0=rojo, 1=amarillo, 2=verde
                     color = "#e74c3c" if estado == 0 else "#f1c40f" if estado == 1 else "#27ae60"
                     circle_radius = 10
                     circle_x = x + w / 2
                     circle_y = y + row_height / 2
                     self.canvas.create_oval(
-                        circle_x - circle_radius +2,
-                        circle_y - circle_radius +2,
-                        circle_x + circle_radius +2,
-                        circle_y + circle_radius +2,
+                        circle_x - circle_radius + 2,
+                        circle_y - circle_radius + 2,
+                        circle_x + circle_radius + 2,
+                        circle_y + circle_radius + 2,
                         fill=color,
                         outline="black",
                         width=1
                     )
                 else:
-                    # Texto centrado en las demás celdas/ camie: text=valor
-                    self.canvas.create_text(x + w/2, y + row_height/2, text=valor, anchor="center", font=("Helvetica", 10))
+                    # Texto normal
+                    self.canvas.create_text(
+                        x + w / 2,
+                        y + row_height / 2,
+                        text=valor,
+                        anchor="center",
+                        font=("Helvetica", 10)
+                    )
 
                 x += w
-    #agrego esta funcion nueva  / Modificacion 10/11
-    def cargar_datos_reales(self):
-        ruta_json = os.path.join(os.getcwd(), "datos_reales.json")
-        datos_dosis = {}
-        #hoy = datetime().strftime("%Y-%m-%d")
-        try:
-            with open(ruta_json, "r", encoding="utf-8") as f:
-                datos_json = json.load(f)
-
-            for timestamp, corrales in datos_json.items():
-                #if timestamp != hoy:
-                #    continue
-                for corral, registros in corrales.items():
-                    for registro in registros:
-                        caravana = registro.get("caravana")
-                        if caravana:
-                            if caravana not in datos_dosis:
-                                datos_dosis[caravana] = {"dosis_recibidas": 0}
-                            datos_dosis[caravana]["dosis_recibidas"] += 1
-
-            return datos_dosis
-
-        except Exception as e:
-            print(f"Error al cargar datos_reales.json: {e}")
-            return {}
-            
-    #esto otro es nuevo 08/10/2025
-    #def cargar_datos_semaforo(self):
-    #    from datetime import datetime
-    #    ruta_json =os.path.join(os.getcwd(), "datos_reales.json")
-    #    datos_fechas = {}
-    #    try:
-    #        with open(ruta_json, "r", encoding="utf-8") as f:
-    #            datos_json = json.load(f)
-    #    
-    #        for timestamp,corrales in datos_json.items():
-    #            for corral, registros in corrales.items():
-    #                for registro in registros:
-    #                    caravana = registro.get("caravana")
-    #                    ts = registro.get("timestamp", timestamp)
-    #                    try:
-    #                        fecha = datetime.fromtimestamp(int(ts)).strftime("%Y-%m-%d")
-    #                    except Exception:
-    #                        continue
-    #                    if caravana:
-    #                        datos_fechas.setdefault(caravana, []).append(fecha)
-    #        return datos_fechas
-    #    except Exception as e:
-    #        print(f"Error al cargar datos para semaforo: {e}")
-    #        return {}
 
     def actualizar_tabla(self):
-        self.datos_reales = self.cargar_datos_reales()
-        #esto otro es nuevo 08/10/2025
-        #self.datos_semaforo = self.cargar_datos_semaforo()
         self.dibujar_tabla()
 
     def cerrar_ventana(self):

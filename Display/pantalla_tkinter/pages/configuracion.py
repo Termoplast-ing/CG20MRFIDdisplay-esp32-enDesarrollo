@@ -4,7 +4,6 @@ from pages.wifi_hora import WifiHoraWindow
 from pages.funcionalidad import FuncionalidadWindow
 from pages.alarma_errores import AlarmaErroresWindow
 from pages.estaciones_corrales import EstacionesCorralesWindow 
-
 class ConfiguracionWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
