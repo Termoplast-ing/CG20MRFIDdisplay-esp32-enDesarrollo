@@ -16,7 +16,7 @@ def crearTablas():
             intervalo INTEGER,
             pesoTotal FLOAT,
             cantidadDosis INTEGER,
-            tirarAgua BOOLEAN,
+            tirarAgua BLOB,
             descripcion TEXT,
             caravana TEXT,
             numeroInterno INTEGER,
@@ -434,3 +434,4 @@ def obtenerFechasInseminacion():
     filas = cur.fetchall()
     conn.close()
     return {car: fecha for car, fecha in filas}
+
