@@ -3,14 +3,16 @@ import os
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'comederos.db')
 
+
 def get_connection():
     return sqlite.connect(DB_PATH)
+
 
 def crearTablas():
     conn = get_connection()
     cursor = conn.cursor()
-    
-    cursor.execute (
+
+    cursor.execute(
         """CREATE TABLE IF NOT EXISTS animal(
             idanimal INTEGER PRIMARY KEY AUTOINCREMENT,
             intervalo INTEGER,
@@ -27,35 +29,48 @@ def crearTablas():
             FOREIGN KEY (IdIndiceCorporal) REFERENCES indice_corporal(idIndiceCorporal),
             FOREIGN KEY (idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
             )"""
-        )
-    
-    cursor.execute (
-         """CREATE TABLE IF NOT EXISTS indice_corporal(
+    )
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS indice_corporal(
             idIndiceCorporal INTEGER PRIMARY KEY AUTOINCREMENT,
             descripcion TEXT,
             corporal INTEGER
             )"""
+    )
+
+    # Semilla de índices corporales por defecto (si no hay ninguno)
+    cursor.execute("SELECT COUNT(*) FROM indice_corporal")
+    cant_indices = cursor.fetchone()[0]
+    if cant_indices == 0:
+        cursor.executemany(
+            "INSERT INTO indice_corporal (descripcion, corporal) VALUES (?, ?)",
+            [
+                ("Gorda", 50),
+                ("Normal", 100),
+                ("Flaca", 200),
+            ]
         )
-    
-    cursor.execute (
-         """CREATE TABLE IF NOT EXISTS tipo_curva(
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS tipo_curva(
             idTipoCurva INTEGER PRIMARY KEY AUTOINCREMENT,
             descripcion TEXT
             )"""
     )
 
-    cursor.execute (
-         """CREATE TABLE IF NOT EXISTS datos_curva(
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS datos_curva(
             idDatosCurva INTEGER PRIMARY KEY AUTOINCREMENT,
             dia INTEGER,
             indice INTEGER,
             idTipoCurva INTEGER,
             FOREIGN KEY (idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
-            )"""  
+            )"""
     )
 
     cursor.execute(
-         """CREATE TABLE IF NOT EXISTS configuracion(
+        """CREATE TABLE IF NOT EXISTS configuracion(
             idConfiguracion INTEGER PRIMARY KEY AUTOINCREMENT,
             calibracionMotor INTEGER,
             calibracionAgua INTEGER,
@@ -69,7 +84,7 @@ def crearTablas():
     )
 
     cursor.execute(
-         """CREATE TABLE IF NOT EXISTS usuario(
+        """CREATE TABLE IF NOT EXISTS usuario(
          idUsuario INTEGER PRIMARY KEY AUTOINCREMENT,
          usuario TEXT,
          contrasenia TEXT,
@@ -79,7 +94,7 @@ def crearTablas():
     )
 
     cursor.execute(
-         """CREATE TABLE IF NOT EXISTS estacion(
+        """CREATE TABLE IF NOT EXISTS estacion(
          idEstacion INTEGER PRIMARY KEY AUTOINCREMENT,
          descripcion TEXT,
          direccion INTEGER DEFAULT 0
@@ -98,7 +113,7 @@ def crearTablas():
                 "INSERT INTO estacion (descripcion, direccion) VALUES (?, ?)",
                 (f"Estacion {i}", i)
             )
-    
+
     # Trigger: máximo 17 segmentos por cada curva (idTipoCurva)
     cursor.execute("""
     CREATE TRIGGER IF NOT EXISTS limitar_segmentos_por_curva
@@ -111,8 +126,7 @@ def crearTablas():
         SELECT RAISE(ABORT, 'Maximo 17 segmentos por curva');
     END;
     """)
-    
-    
+
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS tipo_alarma(
             idTipoAlarma INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,7 +146,6 @@ def crearTablas():
         )"""
     )
 
-    
     cursor.execute("SELECT COUNT(*) FROM tipo_alarma")
     cant_tipos = cursor.fetchone()[0]
     if cant_tipos == 0:
@@ -171,7 +184,115 @@ def crearTablas():
             peso REAL NOT NULL
         )"""
     )
+    conn.commit()
+    conn.close()
 
+
+def obtenerConfiguracion():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT calibracionMotor,
+                  calibracionAgua,
+                  caravanaDesconocida,
+                  caravanaLibre1,
+                  caravanaLibre2,
+                  caravanaLibre3,
+                  caravanaLibre4,
+                  caravanaLibre5
+           FROM configuracion
+           ORDER BY idConfiguracion DESC
+           LIMIT 1"""
+    )
+    fila = cur.fetchone()
+    conn.close()
+
+    if fila is None:
+        return 0, 0, 0.0, []
+
+    cal_motor, cal_agua, car_desc, c1, c2, c3, c4, c5 = fila
+    caravanas = [c for c in (c1, c2, c3, c4, c5) if c]
+    return cal_motor or 0, cal_agua or 0, float(car_desc or 0.0), caravanas
+
+
+def guardarConfiguracion(cal_motor: int,
+                         cal_agua: int,
+                         caravana_desc: float,
+                         caravanas_libres: list[str]):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    car_list = list(caravanas_libres[:5]) + [None] * 5
+    c1, c2, c3, c4, c5 = car_list[:5]
+
+    cur.execute(
+        "SELECT idConfiguracion FROM configuracion ORDER BY idConfiguracion DESC LIMIT 1"
+    )
+    fila = cur.fetchone()
+
+    if fila:
+        id_conf = fila[0]
+        cur.execute(
+            """UPDATE configuracion
+               SET calibracionMotor = ?,
+                   calibracionAgua = ?,
+                   caravanaDesconocida = ?,
+                   caravanaLibre1 = ?,
+                   caravanaLibre2 = ?,
+                   caravanaLibre3 = ?,
+                   caravanaLibre4 = ?,
+                   caravanaLibre5 = ?
+               WHERE idConfiguracion = ?""",
+            (cal_motor, cal_agua, caravana_desc,
+             c1, c2, c3, c4, c5, id_conf)
+        )
+    else:
+        cur.execute(
+            """INSERT INTO configuracion
+               (calibracionMotor, calibracionAgua, caravanaDesconocida,
+                caravanaLibre1, caravanaLibre2, caravanaLibre3, caravanaLibre4, caravanaLibre5)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (cal_motor, cal_agua, caravana_desc,
+             c1, c2, c3, c4, c5)
+        )
+
+    conn.commit()
+    conn.close()
+
+
+def obtenerIndicesCorporales():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT idIndiceCorporal, descripcion, corporal
+           FROM indice_corporal
+           ORDER BY idIndiceCorporal"""
+    )
+    filas = cur.fetchall()
+    conn.close()
+    return filas
+
+
+def insertarIndiceCorporal(descripcion: str, corporal: int) -> int:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO indice_corporal (descripcion, corporal) VALUES (?, ?)",
+        (descripcion, corporal)
+    )
+    nuevo_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return nuevo_id
+
+
+def eliminarIndiceCorporal(id_indice: int):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM indice_corporal WHERE idIndiceCorporal = ?",
+        (id_indice,)
+    )
     conn.commit()
     conn.close()
 
@@ -339,8 +460,7 @@ def guardarCurva(nombre: str, segmentos: list):
 
             cur.execute(
                 """ INSERT INTO datos_curva (dia, indice, idTipoCurva)
-                VALUES (?, ?, ?)
-                """,
+                VALUES (?, ?, ?)""",
                 (dia, indice_val, id_tipo_curva)
             )
 
@@ -354,7 +474,7 @@ def guardarCurva(nombre: str, segmentos: list):
     finally:
         conn.close()
 
-def obtenerAnimalesPorCorral(corral: int): #Listado para datos.py
+def obtenerAnimalesPorCorral(corral: int):  # Listado para datos.py
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
@@ -373,6 +493,7 @@ def obtenerAnimalesPorCorral(corral: int): #Listado para datos.py
     filas = cur.fetchall()
     conn.close()
     return filas
+
 
 def obtenerEstaciones():
     conn = get_connection()
@@ -422,33 +543,14 @@ def obtenerLecturas():
 
 
 def obtenerFechasInseminacion():
-   # Devuelve {caravana: fechaInseminacion} desde la tabla animal. Se usa para calcular el día de ciclo.
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
         """SELECT caravana, fechaInseminacion
-            FROM animal
-            WHERE caravana IS NOT NULL
-          AND fechaInseminacion IS NOT NULL"""
+           FROM animal
+           WHERE caravana IS NOT NULL
+             AND fechaInseminacion IS NOT NULL"""
     )
     filas = cur.fetchall()
     conn.close()
     return {car: fecha for car, fecha in filas}
-
-# prueba tabla datos
-
-def ingreso_animal():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """INSERT INTO animal (intervalo, pesoTotal, cantidadDosis, tirarAgua,
-         descripcion, caravana, numeroInterno, fechaInseminacion,
-         IdIndiceCorporal, idTipoCurva, corral)
-         VALUES (12, 150.0, 3, 1, 'Dieta de prueba', '123456789', 1,
-         '2024-01-15', 1, 1, 1)"""
-    )
-    conn.commit()
-    conn.close()
-
-#def borrar_tablas():
-
