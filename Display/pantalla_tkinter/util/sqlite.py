@@ -11,8 +11,8 @@ def crearTablas():
     cursor = conn.cursor()
     
     cursor.execute (
-        """CREATE TABLE IF NOT EXISTS dieta(
-            idDieta INTEGER PRIMARY KEY AUTOINCREMENT,
+        """CREATE TABLE IF NOT EXISTS animal(
+            idanimal INTEGER PRIMARY KEY AUTOINCREMENT,
             intervalo INTEGER,
             pesoTotal FLOAT,
             cantidadDosis INTEGER,
@@ -364,7 +364,7 @@ def obtenerAnimalesPorCorral(corral: int): #Listado para datos.py
              pesoTotal,
              cantidadDosis,
              intervalo
-        FROM dieta
+        FROM animal
         WHERE corral = ?
         ORDER BY numeroInterno
         """,
@@ -422,12 +422,12 @@ def obtenerLecturas():
 
 
 def obtenerFechasInseminacion():
-   # Devuelve {caravana: fechaInseminacion} desde la tabla dieta. Se usa para calcular el día de ciclo.
+   # Devuelve {caravana: fechaInseminacion} desde la tabla animal. Se usa para calcular el día de ciclo.
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
         """SELECT caravana, fechaInseminacion
-            FROM dieta
+            FROM animal
             WHERE caravana IS NOT NULL
           AND fechaInseminacion IS NOT NULL"""
     )
@@ -435,3 +435,17 @@ def obtenerFechasInseminacion():
     conn.close()
     return {car: fecha for car, fecha in filas}
 
+# prueba datos
+
+def ingreso_animal():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO animal (intervalo, pesoTotal, cantidadDosis, tirarAgua,
+         descripcion, caravana, numeroInterno, fechaInseminacion,
+         IdIndiceCorporal, idTipoCurva, corral)
+         VALUES (12, 150.0, 3, 1, 'Dieta de prueba', '123456789', 1,
+         '2024-01-15', 1, 1, 1)"""
+    )
+    conn.commit()
+    conn.close()
