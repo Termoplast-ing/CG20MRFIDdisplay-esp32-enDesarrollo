@@ -7,7 +7,7 @@ from tkcalendar import DateEntry
 import threading
 from datetime import datetime
 from util.util_calendario import seleccionar_fecha
-from util import sqlite as db_local   # <--- NUEVO: usamos tu sqlite.py
+from util import sqlite as db_local 
 
 
 class Estaciones:
@@ -385,3 +385,4 @@ class Estaciones:
     def iniciar_recepcion_uart(self):
         hilo_uart = threading.Thread(target=self.leer_uart_y_guardar_json, daemon=True)
         hilo_uart.start()
+
