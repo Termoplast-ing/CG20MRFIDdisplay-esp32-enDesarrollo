@@ -6,6 +6,7 @@ from pages.configuracion import ConfiguracionWindow
 from pages.datos import DatosWindow
 from pages.alarma import AlarmaWindow
 
+
 class MenuInferiorWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -23,15 +24,14 @@ class MenuInferiorWindow(tk.Toplevel):
         self.frame_logo.grid(row=0, column=0, sticky="ew", pady=20)
         self.frame_logo.grid_columnconfigure(0, weight=1)
 
+
         self.logo = self.master.logo
         self.crear_logo(self.frame_logo)
 
-        # --- Frame del contenido central con los botones ---
         self.frame_contenido = tk.Frame(self, bg="#EF9480")
         self.frame_contenido.grid(row=1, column=0, sticky="nsew", padx=0, pady=(0, 25))
         self.frame_contenido.grid_columnconfigure(0, weight=1)
 
-        # Botones de opciones
         botones = [
             ("Gestión Animal", self.mostrar_gestion_animal),
             ("Login", self.mostrar_login),
@@ -41,21 +41,33 @@ class MenuInferiorWindow(tk.Toplevel):
         ]
 
         for i, (texto, comando) in enumerate(botones):
-            btn = tk.Button(self.frame_contenido, text=texto, font=("Helvetica", 18),
-                            command=comando, bg="red", fg="#ffffff", bd=9)
+            btn = tk.Button(
+                self.frame_contenido,
+                text=texto,
+                font=("Helvetica", 18),
+                command=comando,
+                bg="red",
+                fg="#ffffff",
+                bd=9
+            )
             btn.grid(row=i, column=0, padx=100, pady=10, sticky="ew")
 
-        # --- Frame inferior con el botón "Atrás" abajo a la izquierda ---
         self.frame_boton_atras = tk.Frame(self, bg="#EF9480", height=80)
         self.frame_boton_atras.grid(row=2, column=0, sticky="ew")
         self.frame_boton_atras.grid_columnconfigure(0, weight=0)
         self.frame_boton_atras.grid_columnconfigure(1, weight=1)
 
-        boton_atras = tk.Button(self.frame_boton_atras, text="<< Atrás", font=("Helvetica", 16),
-                                command=self.cerrar_ventana, bg="red", fg="#ffffff", bd=7)
+        boton_atras = tk.Button(
+            self.frame_boton_atras,
+            text="<< Atrás",
+            font=("Helvetica", 16),
+            command=self.cerrar_ventana,
+            bg="red",
+            fg="#ffffff",
+            bd=7
+        )
         boton_atras.grid(row=0, column=0, padx=10, pady=70, sticky="w")
 
-        # Estructura general del grid principal
         self.rowconfigure(1, weight=1)  # contenido central expandible
         self.columnconfigure(0, weight=1)
 

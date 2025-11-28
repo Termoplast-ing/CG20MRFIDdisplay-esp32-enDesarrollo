@@ -194,7 +194,7 @@ class CurvaAlimentacionWindow(tk.Toplevel):
         )
         label_indice.grid(row=0, column=2)
 
-        entry_indice = tk.Entry(
+        entry_   = tk.Entry(
             frame_contenido,
             font=("Helvetica", 11),
             bg="white",

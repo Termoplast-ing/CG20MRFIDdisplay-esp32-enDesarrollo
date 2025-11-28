@@ -3,23 +3,22 @@ from tkinter import ttk
 import json
 import os
 import serial
-from tkcalendar import DateEntry
 import threading
 from datetime import datetime
-from util.util_calendario import seleccionar_fecha
 from util import sqlite as db_local 
 
 
 class Estaciones:
     def __init__(self, parent_frame):
         self.parent_frame = parent_frame
-        self.fecha_mostrada = datetime.now().strftime("%d/%m/%Y")  # <- Fecha actual 
+        self.fecha_mostrada = datetime.now().strftime("%d/%m/%Y")  # Fecha actual 
         self.estados_colores = {
             'alerta': 'red',    
             'normal': 'green',  
             'completo': 'blue'  
         }     
 
+        # ===== Frame de la tabla =====
         self.frame_tabla = tk.Frame(self.parent_frame, bg="#EF9480")
         self.frame_tabla.grid(row=1, column=0, sticky="nsew", padx=5, pady=20)
         self.frame_tabla.config(height=400)
@@ -31,7 +30,7 @@ class Estaciones:
         self.iniciar_recepcion_uart()
 
     def crear_tabla_estaciones(self):
-        columnas = ["Corral", "N° Caravana", "Peso Acu", "Fecha"]
+        columnas = ["Corral", "N° Caravana", "Peso Acu", "Día Ciclo"]
 
         scroll_frame = tk.Frame(self.frame_tabla, bg="#EF9480")
         scroll_frame.grid(row=1, column=0, sticky="nsew")
@@ -41,34 +40,38 @@ class Estaciones:
         scroll_frame.grid_columnconfigure(1, weight=0)
 
         style = ttk.Style()
-        style.configure("Treeview.Heading",
-                        font=("Helvetica", 16, "bold"),
-                        background="#f0ad4e",
-                        foreground="black")
-        style.configure("Treeview",
-                        font=("Helvetica", 18),
-                        rowheight=40,
-                        background="#cacaca",
-                        fieldbackground="#cacaca",
-                        foreground="black",
-                        relief="solid",
-                        borderwidth=2)
+        style.configure(
+            "Treeview.Heading",
+            font=("Helvetica", 16, "bold"),
+            background="#f0ad4e",
+            foreground="black"
+        )
+        style.configure(
+            "Treeview",
+            font=("Helvetica", 18),
+            rowheight=40,
+            background="#cacaca",
+            fieldbackground="#cacaca",
+            foreground="black",
+            relief="solid",
+            borderwidth=2
+        )
 
         self.treeview = ttk.Treeview(
             scroll_frame,
-            columns=("Corral", "N°Caravana", "Peso Acu", "Fecha"),
+            columns=("Corral", "N°Caravana", "Peso Acu", "Día Ciclo"),
             show="headings",
             height=10
         )
         self.treeview.heading("Corral", text="Corral", command=self.ordenar_corral)
         self.treeview.heading("N°Caravana", text="N°Caravana")
         self.treeview.heading("Peso Acu", text="Peso Acu")
-        self.treeview.heading("Fecha", text="Fecha")
+        self.treeview.heading("Día Ciclo", text="Día Ciclo")
 
         self.treeview.column("Corral", width=65, anchor="center")
         self.treeview.column("N°Caravana", width=205, anchor="w")
         self.treeview.column("Peso Acu", width=100, anchor="center")
-        self.treeview.column("Fecha", width=130, anchor="center")
+        self.treeview.column("Día Ciclo", width=130, anchor="center")
         self.treeview.grid(row=0, column=0, sticky="nsew")
 
         scrollbar_y = tk.Scrollbar(scroll_frame, orient="vertical", command=self.treeview.yview)
@@ -80,12 +83,12 @@ class Estaciones:
         self.treeview.bind("<ButtonRelease-1>", self.cambiar_color_fila)
         self.ordenacion_estado = {"Corral": True}
 
-    # ------------------- AHORA USA SQLITE -------------------
+    # ------------------- SQLITE: fechas de inseminación -------------------
 
     def cargar_fechas_inseminacion(self):
         """
-        Antes leía datos_animales.json.
-        Ahora usa la tabla 'animal' para obtener {caravana: fechaInseminacion}.
+        Usa tu función db_local.obtenerFechasInseminacion()
+        que devuelve {caravana: fechaInseminacion}
         """
         try:
             return db_local.obtenerFechasInseminacion()
@@ -95,8 +98,7 @@ class Estaciones:
 
     def cargar_datos_db(self):
         """
-        Reemplaza cargar_datos_json: ahora lee las lecturas desde la tabla 'lectura'
-        y arma el mismo formato de salida que antes:
+        Lee lecturas desde la tabla 'lectura' y arma:
         [(corral_num, caravana, 'peso kg', dia_ciclo_str), ...]
         """
         try:
@@ -107,35 +109,33 @@ class Estaciones:
 
         fechas_insem = self.cargar_fechas_inseminacion()
 
+        # Acumular peso por (corral, caravana, fecha_pesaje)
         acumulados = {}
         for corral, caravana, fecha_pesaje, peso in filas:
-            # Normalizamos tipos
             corral_num = str(corral)
             try:
                 peso_val = float(peso)
             except Exception:
                 peso_val = 0.0
 
-            # clave: (corral_str, caravana, fecha_pesaje)
             corral_str = f"Corral {corral_num}"
             clave = (corral_str, caravana, fecha_pesaje)
             if clave not in acumulados:
                 acumulados[clave] = 0.0
             acumulados[clave] += peso_val
 
-        # Ordenar por fecha (YYYY-MM-DD)
+        # Ordenar por fecha de pesaje
         try:
             ordenado = sorted(
                 acumulados.items(),
                 key=lambda x: datetime.strptime(x[0][2], "%Y-%m-%d")
             )
         except Exception:
-            # Si alguna fecha viene mal, caemos en orden sin parsear
             ordenado = list(acumulados.items())
 
         resultado = []
         for (corral_str, caravana, fecha_pesaje), peso_total in ordenado:
-            # Evitar repetir caravana (igual que antes)
+            # Si ya mostramos esa caravana, no la repetimos
             if any(r[1] == caravana for r in resultado):
                 continue
 
@@ -148,12 +148,12 @@ class Estaciones:
                     if delta < 1:
                         dia_ciclo = "-"
                     else:
-                        dia_ciclo = str(delta)
+                        dia_ciclo = str(delta)  # Día 1, 2, 3, etc.
                 except Exception:
                     pass
 
             resultado.append(
-                (corral_str.split()[-1],  # solo el número de corral
+                (corral_str.split()[-1],  # solo número de corral
                  caravana,
                  f"{peso_total:.2f} kg",
                  dia_ciclo)
@@ -166,27 +166,29 @@ class Estaciones:
     def actualizar_tabla(self):
         datos = self.cargar_datos_db()
 
-        # Filtrar solo los que tienen día de ciclo no vacío
+        # Sólo los que tienen día de ciclo calculado
         datos_filtrados = [item for item in datos if item[-1]]
 
-        # Ordenar por día de ciclo numéricamente (de menor a mayor)
-        datos_filtrados.sort(key=lambda x: int(x[-1]) if str(x[-1]).isdigit() else 9999)
+        # Ordenar por día de ciclo (numérico)
+        datos_filtrados.sort(
+            key=lambda x: int(x[-1]) if str(x[-1]).isdigit() else 9999
+        )
 
-        # Limitar a 20 registros máximo (vos tenías 21, dejo 21 por si lo querés igual)
+        # Limitar a 21 registros
         datos_filtrados = datos_filtrados[:21]
 
-        # Limpiar la tabla
+        # Limpiar tabla
         for item in self.treeview.get_children():
             self.treeview.delete(item)
 
-        # Insertar los datos
+        # Insertar filas
         for item in datos_filtrados:
             self.treeview.insert("", "end", values=item)
 
-        # Actualizar cada X ms (tenías 15000 = 15s, lo dejo igual)
+        # Refrescar cada 15 segundos
         self.parent_frame.after(15000, self.actualizar_tabla)
 
-    # ------------------- FILTRO POR FECHA (si lo usás) -------------------
+    # ------------------- (Opcional) filtro por fecha -------------------
 
     def filtrar_por_fecha(self, fecha):
         try:
@@ -195,7 +197,8 @@ class Estaciones:
             fecha_convertida = fecha
 
         datos = self.cargar_datos_db()
-        filtrados = [item for item in datos if item[-1] and fecha_convertida in item]  # opcional / ajustar
+        # Ojo: acá podrías querer filtrar por fecha_pesaje si la devolvés también
+        filtrados = [item for item in datos if item[-1] and fecha_convertida in item]
 
         for item in self.treeview.get_children():
             self.treeview.delete(item)
@@ -207,7 +210,7 @@ class Estaciones:
         for item in filtrados[:20]:
             self.treeview.insert("", "end", values=item)
 
-    # ------------------- UI extra: colores, orden, etc. -------------------
+    # ------------------- UI extra: colores, orden -------------------
 
     def cambiar_color_fila(self, event):
         item = self.treeview.focus()
@@ -242,7 +245,7 @@ class Estaciones:
 
         self.ordenacion_estado["Corral"] = not ascending
 
-    # ------------------- UART + PERSISTENCIA -------------------
+    # ------------------- UART + persistencia -------------------
 
     def leer_uart_y_guardar_json(self):
         puerto = "/dev/serial0"
@@ -270,7 +273,7 @@ class Estaciones:
                         print("Mensaje recibido en Raspberry:", json_str)
                         try:
                             datos = json.loads(json_str)
-                            # Guardamos en JSON (compatibilidad) y en SQLite
+                            # Guarda JSON + inserta en SQLite
                             self.guardar_en_archivo(datos)
 
                             if hasattr(self.parent_frame, "modal_animal") and datos:
@@ -285,7 +288,7 @@ class Estaciones:
                             print("Error al decodificar JSON:", json_str)
 
     def _normalizar_fecha_sql(self, fecha_raw):
-        # Si es int o string de dígitos -> timestamp
+        # int o string de dígitos → timestamp
         if isinstance(fecha_raw, int) or (isinstance(fecha_raw, str) and fecha_raw.isdigit()):
             try:
                 return datetime.fromtimestamp(int(fecha_raw)).strftime("%Y-%m-%d")
@@ -296,7 +299,6 @@ class Estaciones:
             texto = str(fecha_raw)
             if "T" in texto:
                 return texto.split("T")[0]
-            # Si ya es 'YYYY-MM-DD'
             if len(texto) == 10 and texto[4] == "-" and texto[7] == "-":
                 return texto
         except Exception:
@@ -306,8 +308,8 @@ class Estaciones:
 
     def guardar_en_archivo(self, datos_recibidos):
         """
-        Sigue guardando en datos_reales.json como antes,
-        pero AHORA también inserta en SQLite (tabla lectura).
+        Sigue guardando en datos_reales.json (compatibilidad)
+        y también inserta en SQLite (tabla lectura).
         """
         archivo = "datos_reales.json"
 
@@ -315,7 +317,7 @@ class Estaciones:
             with open(archivo, "r", encoding="utf-8") as f:
                 try:
                     datos_existentes = json.load(f)
-                except:
+                except Exception:
                     datos_existentes = {}
         else:
             datos_existentes = {}
@@ -328,6 +330,8 @@ class Estaciones:
 
             if not fecha or not caravana or corral_num is None:
                 continue
+
+            # Clave para el JSON viejo
             try:
                 dia = int(fecha)
             except (ValueError, TypeError):
@@ -350,6 +354,7 @@ class Estaciones:
                 "peso": str(peso)
             })
 
+            # Inserción en SQLite
             fecha_sql = self._normalizar_fecha_sql(fecha)
             try:
                 peso_val = float(str(peso).replace(",", ".")) / 10.0
@@ -366,7 +371,7 @@ class Estaciones:
             except Exception as e:
                 print(f"Error insertando lectura en SQLite: {e}")
 
-            # contador en memoria para DatosWindow (si existe)
+            # Contador en memoria para DatosWindow (si lo usás)
             if caravana:
                 def actualizar_contador(c=caravana):
                     if not hasattr(self.parent_frame, "datos_reales"):
@@ -383,6 +388,8 @@ class Estaciones:
             json.dump(datos_existentes, f, indent=4)
 
     def iniciar_recepcion_uart(self):
-        hilo_uart = threading.Thread(target=self.leer_uart_y_guardar_json, daemon=True)
+        hilo_uart = threading.Thread(
+            target=self.leer_uart_y_guardar_json,
+            daemon=True
+        )
         hilo_uart.start()
-

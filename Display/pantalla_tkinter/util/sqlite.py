@@ -14,20 +14,56 @@ def crearTablas():
 
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS animal(
-            idanimal INTEGER PRIMARY KEY AUTOINCREMENT,
-            intervalo INTEGER,
-            pesoTotal FLOAT,
-            cantidadDosis INTEGER,
-            tirarAgua BLOB,
-            descripcion TEXT,
+            idAnimal INTEGER PRIMARY KEY AUTOINCREMENT,
             caravana TEXT,
             numeroInterno INTEGER,
-            fechaInseminacion DATE,
-            IdIndiceCorporal INTEGER,
+            fechaInseminacion TEXT,
+            idCorral INTEGER,
+            idDieta INTEGER,
+            FOREIGN KEY(idCorral) REFERENCES corral(idCorral),
+            FOREIGN KEY(idDieta) REFERENCES dieta(idDieta)
+            )"""
+    )
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS corral(
+            idCorral INTEGER PRIMARY KEY AUTOINCREMENT,
+            descripcion TEXT,
+            direccion INTEGER)"""
+    )
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS alarma(
+            idAlarma INTEGER PRIMARY KEY AUTOINCREMENT,
+            fechaHora TEXT,
+            numeroInterno INTEGER,
+            caravana TEXT,
+            idCorral INTEGER,
+            idTipoAlarma INTEGER,
+            FOREIGN KEY(idCorral) REFERENCES corral(idCorral),
+            FOREIGN KEY(idTipoAlarma) REFERENCES tipo_alarma(idTipoAlarma)
+            )"""
+    )
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS tipo_alarma(
+            idTipoAlarma INTEGER PRIMARY KEY AUTOINCREMENT,
+            descripcion TEXT
+            )"""
+    )
+
+    cursor.execute(
+        """CREATE TABLE IF NOT EXISTS dieta(
+            idDieta INTEGER PRIMARY KEY AUTOINCREMENT,
+            descripcion TEXT,
+            intervalo INTEGER,
+            pesoTotal REAL,
+            cantidadDosis INTEGER,
+            tirarAgua BLOB,
+            idIndiceCorporal INTEGER,
             idTipoCurva INTEGER,
-            corral INTEGER,
-            FOREIGN KEY (IdIndiceCorporal) REFERENCES indice_corporal(idIndiceCorporal),
-            FOREIGN KEY (idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
+            FOREIGN KEY(idIndiceCorporal) REFERENCES indice_corporal(idIndiceCorporal),
+            FOREIGN KEY(idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
             )"""
     )
 
@@ -38,19 +74,6 @@ def crearTablas():
             corporal INTEGER
             )"""
     )
-
-    # Semilla de índices corporales por defecto (si no hay ninguno)
-    cursor.execute("SELECT COUNT(*) FROM indice_corporal")
-    cant_indices = cursor.fetchone()[0]
-    if cant_indices == 0:
-        cursor.executemany(
-            "INSERT INTO indice_corporal (descripcion, corporal) VALUES (?, ?)",
-            [
-                ("Gorda", 50),
-                ("Normal", 100),
-                ("Flaca", 200),
-            ]
-        )
 
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS tipo_curva(
@@ -65,7 +88,7 @@ def crearTablas():
             dia INTEGER,
             indice INTEGER,
             idTipoCurva INTEGER,
-            FOREIGN KEY (idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
+            FOREIGN KEY(idTipoCurva) REFERENCES tipo_curva(idTipoCurva)
             )"""
     )
 
@@ -74,116 +97,34 @@ def crearTablas():
             idConfiguracion INTEGER PRIMARY KEY AUTOINCREMENT,
             calibracionMotor INTEGER,
             calibracionAgua INTEGER,
-            caravanaDesconocida FLOAT,
+            caravanaDesconocida REAL,
             caravanaLibre1 TEXT,
             caravanaLibre2 TEXT,
             caravanaLibre3 TEXT,
             caravanaLibre4 TEXT,
             caravanaLibre5 TEXT
-         )"""
+            )"""
     )
 
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS usuario(
-         idUsuario INTEGER PRIMARY KEY AUTOINCREMENT,
-         usuario TEXT,
-         contrasenia TEXT,
-         nombreWifi TEXT,
-         contraseniaWifi TEXT
-         )"""
+            idUsuario INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombreUsuario TEXT,
+            contrasenia TEXT,
+            nombreWifi TEXT,
+            contraseniaWifi TEXT
+            )"""
     )
-
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS estacion(
-         idEstacion INTEGER PRIMARY KEY AUTOINCREMENT,
-         descripcion TEXT,
-         direccion INTEGER DEFAULT 0
-         )"""
-    )
-
-    # Asegura siempre 10 estaciones (1..10)
-    for i in range(1, 11):
-        cursor.execute(
-            "SELECT 1 FROM estacion WHERE direccion = ? LIMIT 1",
-            (i,)
-        )
-        existe = cursor.fetchone()
-        if existe is None:
-            cursor.execute(
-                "INSERT INTO estacion (descripcion, direccion) VALUES (?, ?)",
-                (f"Estacion {i}", i)
-            )
-
-    # Trigger: máximo 17 segmentos por cada curva (idTipoCurva)
-    cursor.execute("""
-    CREATE TRIGGER IF NOT EXISTS limitar_segmentos_por_curva
-    BEFORE INSERT ON datos_curva
-    WHEN (
-        SELECT COUNT(*) FROM datos_curva
-        WHERE idTipoCurva = NEW.idTipoCurva
-    ) >= 17
-    BEGIN
-        SELECT RAISE(ABORT, 'Maximo 17 segmentos por curva');
-    END;
-    """)
-
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS tipo_alarma(
-            idTipoAlarma INTEGER PRIMARY KEY AUTOINCREMENT,
-            descripcion TEXT NOT NULL
-        )"""
-    )
-
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS alarma(
-            idAlarma INTEGER PRIMARY KEY AUTOINCREMENT,
-            fechaHora TEXT NOT NULL,
-            corral INTEGER,
-            numeroInterno INTEGER,
-            caravana TEXT,
-            idTipoAlarma INTEGER,
-            FOREIGN KEY (idTipoAlarma) REFERENCES tipo_alarma(idTipoAlarma)
-        )"""
-    )
-
-    cursor.execute("SELECT COUNT(*) FROM tipo_alarma")
-    cant_tipos = cursor.fetchone()[0]
-    if cant_tipos == 0:
-        cursor.executemany(
-            "INSERT INTO tipo_alarma (descripcion) VALUES (?)",
-            [
-                ("Animal desconocido",),
-                ("Dieta no cumplida",),
-                ("Falla conexión",),
-            ]
-        )
-
-    # DATOS DE PRUEBA SOLO SI LA TABLA ALARMA ESTÁ VACÍA
-    cursor.execute("SELECT COUNT(*) FROM alarma")
-    cantidad = cursor.fetchone()[0]
-    if cantidad == 0:
-        cursor.executemany(
-            """
-            INSERT INTO alarma (fechaHora, corral, numeroInterno, caravana, idTipoAlarma)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            [
-                ("19/02/25 10:30", 1, 56, "123456789", 1),
-                ("20/02/25 12:00", 2, 6, "345676532", 2),
-                ("21/02/25 10:30", 1, 0, "0", 3),
-                ("21/02/25 12:00", 2, 2, "345676532", 2),
-            ]
-        )
 
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS lectura(
             idLectura INTEGER PRIMARY KEY AUTOINCREMENT,
-            caravana TEXT NOT NULL,
-            corral INTEGER NOT NULL,
-            fecha TEXT NOT NULL,
-            peso REAL NOT NULL
-        )"""
-    )
+            caravana TEXT,
+            corral INTEGER,
+            fecha TEXT,
+            peso REAL
+            )"""
+    )       
     conn.commit()
     conn.close()
 
@@ -321,17 +262,17 @@ def _get_or_create_tipo_alarma(descripcion: str) -> int:
     return id_tipo
 
 
-def insertarAlarma(fechaHora: str, descripcion: str, corral: str,
+def insertarAlarma(fechaHora: str, descripcion: str, corral: int,
                    numeroInterno: int, caravana: str):
     tipoAlarma = _get_or_create_tipo_alarma(descripcion)
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
         """
-        INSERT INTO alarma (fechaHora, corral, numeroInterno, caravana, idTipoAlarma)
+        INSERT INTO alarma (fechaHora, numeroInterno, caravana, idCorral, idTipoAlarma)
         VALUES (?, ?, ?, ?, ?)
         """,
-        (fechaHora, corral, numeroInterno, caravana, tipoAlarma),
+        (fechaHora, numeroInterno, caravana, corral, tipoAlarma),
     )
     conn.commit()
     conn.close()
@@ -341,15 +282,21 @@ def obtenerAlarmas():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        """SELECT a.idAlarma, a.fechaHora, t.descripcion, a.corral, a.numeroInterno, a.caravana
-        FROM alarma a
-        JOIN tipo_alarma t ON a.idTipoAlarma = t.idTipoAlarma
-        ORDER BY a.idAlarma DESC
+        """SELECT a.idAlarma,
+                  a.fechaHora,
+                  t.descripcion,
+                  a.idCorral,
+                  a.numeroInterno,
+                  a.caravana
+           FROM alarma a
+           JOIN tipo_alarma t ON a.idTipoAlarma = t.idTipoAlarma
+           ORDER BY a.idAlarma DESC
         """
     )
     filas = cursor.fetchall()
     conn.close()
     return filas
+
 
 
 def borrarAlarmas():
@@ -474,19 +421,21 @@ def guardarCurva(nombre: str, segmentos: list):
     finally:
         conn.close()
 
-def obtenerAnimalesPorCorral(corral: int):  # Listado para datos.py
+
+def obtenerAnimalesPorCorral(corral: int):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        """SELECT caravana,
-             numeroInterno,
-             fechaInseminacion,
-             pesoTotal,
-             cantidadDosis,
-             intervalo
-        FROM animal
-        WHERE corral = ?
-        ORDER BY numeroInterno
+        """SELECT a.caravana,
+                  a.numeroInterno,
+                  a.fechaInseminacion,
+                  d.pesoTotal,
+                  d.cantidadDosis,
+                  d.intervalo
+           FROM animal a
+           LEFT JOIN dieta d ON a.idDieta = d.idDieta
+           WHERE a.idCorral = ?
+           ORDER BY a.numeroInterno
         """,
         (corral,)
     )
@@ -495,25 +444,27 @@ def obtenerAnimalesPorCorral(corral: int):  # Listado para datos.py
     return filas
 
 
-def obtenerEstaciones():
+
+
+def obtenerCorrales():
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        """SELECT idEstacion, descripcion, direccion
-        FROM estacion
-        ORDER BY idEstacion"""
+        """SELECT idCorral, descripcion, direccion
+           FROM corral
+           ORDER BY idCorral"""
     )
     filas = cur.fetchall()
     conn.close()
     return filas
 
 
-def actualizarDireccionEstacion(id_estacion: int, direccion: int | None):
+def actualizarDireccionCorral(id_corral: int, direccion: int | None):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "UPDATE estacion SET direccion = ? WHERE idEstacion = ?",
-        (direccion, id_estacion)
+        "UPDATE corral SET direccion = ? WHERE idCorral = ?",
+        (direccion, id_corral)
     )
     conn.commit()
     conn.close()
@@ -554,3 +505,187 @@ def obtenerFechasInseminacion():
     filas = cur.fetchall()
     conn.close()
     return {car: fecha for car, fecha in filas}
+
+
+def insertarAnimal(caravana: str,
+                   numeroInterno: str | None,
+                   fechaInseminacion: str,
+                   corral: int):
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        if numeroInterno is not None and str(numeroInterno).strip() != "":
+            num_int = int(numeroInterno)
+        else:
+            num_int = None
+
+        cur.execute(
+            """INSERT INTO animal (
+                   caravana,
+                   numeroInterno,
+                   fechaInseminacion,
+                   idCorral,
+                   idDieta
+               )
+               VALUES (?, ?, ?, ?, NULL)""",
+            (caravana, num_int, fechaInseminacion, corral)
+        )
+
+        conn.commit()
+    finally:
+        conn.close()
+
+
+
+def eliminarAnimalesPorCorralYCaravanas(corral: int, caravanas: list[str]):
+    if not caravanas:
+        return
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        for car in caravanas:
+            cur.execute(
+                "DELETE FROM animal WHERE idCorral = ? AND caravana = ?",
+                (corral, car)
+            )
+        conn.commit()
+    finally:
+        conn.close()
+    
+def insertarDietaConfig(descripcion: str | None,
+                        pesoTotal: float,
+                        cantidadDosis: int,
+                        intervalo: int,
+                        tirarAgua: int) -> int:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """INSERT INTO dieta (
+               descripcion,
+               intervalo,
+               pesoTotal,
+               cantidadDosis,
+               tirarAgua,
+               idIndiceCorporal,
+               idTipoCurva
+           )
+           VALUES (?, ?, ?, ?, ?, NULL, NULL)""",
+        (descripcion, intervalo, pesoTotal, cantidadDosis, tirarAgua)
+    )
+    nuevo_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return nuevo_id
+
+
+def actualizarDietaPorCaravanaYFecha(caravana: str,
+                                     fechaInseminacion: str,
+                                     idDieta: int):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """UPDATE animal
+           SET idDieta = ?
+           WHERE caravana = ? AND fechaInseminacion = ?""",
+        (idDieta, caravana, fechaInseminacion)
+    )
+    conn.commit()
+    conn.close()
+
+
+def obtenerUsuarioPorNombre(nombreUsuario: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT idUsuario, nombreUsuario, contrasenia
+           FROM usuario
+           WHERE nombreUsuario = ?
+           LIMIT 1""",
+        (nombreUsuario,)
+    )
+    fila = cur.fetchone()
+    conn.close()
+    return fila
+
+
+def crearUsuarioPorDefecto():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM usuario")
+    (cant,) = cur.fetchone()
+
+    if cant == 0:
+        cur.execute(
+            """INSERT INTO usuario
+                   (nombreUsuario, contrasenia, nombreWifi, contraseniaWifi)
+               VALUES (?, ?, NULL, NULL)""",
+            ("admin", "1234")
+        )
+        conn.commit()
+
+    conn.close()
+
+
+def obtenerWifi():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT nombreWifi, contraseniaWifi
+           FROM usuario
+           ORDER BY idUsuario DESC
+           LIMIT 1"""
+    )
+    fila = cur.fetchone()
+    conn.close()
+
+    if fila is None:
+        return None, None
+
+    return fila[0], fila[1]
+
+
+def guardarWifi(nombreWifi: str | None, contraseniaWifi: str | None):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT idUsuario FROM usuario ORDER BY idUsuario DESC LIMIT 1")
+    fila = cur.fetchone()
+
+    if fila:
+        id_usuario = fila[0]
+        cur.execute(
+            """UPDATE usuario
+               SET nombreWifi = ?, contraseniaWifi = ?
+               WHERE idUsuario = ?""",
+            (nombreWifi, contraseniaWifi, id_usuario)
+        )
+    else:
+        cur.execute(
+            """INSERT INTO usuario (nombreUsuario, contrasenia, nombreWifi, contraseniaWifi)
+               VALUES (?, ?, ?, ?)""",
+            (None, None, nombreWifi, contraseniaWifi)
+        )
+
+    conn.commit()
+    conn.close()
+
+
+def EliminarTablas():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS animal")
+    cursor.execute("DROP TABLE IF EXISTS corral")
+    cursor.execute("DROP TABLE IF EXISTS alarma")
+    cursor.execute("DROP TABLE IF EXISTS tipo_alarma")
+    cursor.execute("DROP TABLE IF EXISTS dieta")
+    cursor.execute("DROP TABLE IF EXISTS indice_corporal")
+    cursor.execute("DROP TABLE IF EXISTS tipo_curva")
+    cursor.execute("DROP TABLE IF EXISTS datos_curva")
+    cursor.execute("DROP TABLE IF EXISTS configuracion")
+    cursor.execute("DROP TABLE IF EXISTS usuario")
+    cursor.execute("DROP TABLE IF EXISTS lectura")
+    cursor.execute("DROP TABLE IF EXISTS estacion")
+
+    conn.commit()
+    conn.close()    

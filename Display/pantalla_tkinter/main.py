@@ -158,7 +158,6 @@ def enviar_json_gestion(archivo_json):
 # ser.write(mensaje.encode('utf-8'))
 # #ser.write(b"OK")
 db_local.crearTablas()
-#db_local.borrar_tablas()
-#db_local.ingreso_animal()
+#db_local.EliminarTablas()
 App = MasterPanel()
 App.mainloop()
