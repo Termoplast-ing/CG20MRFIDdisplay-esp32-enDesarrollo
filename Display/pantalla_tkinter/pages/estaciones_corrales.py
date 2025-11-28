@@ -13,7 +13,7 @@ class EstacionesCorralesWindow(tk.Toplevel):
         self.resizable(False, False)
         self.grab_set() 
 
-        # Cache: número C1..C10 -> {"id": idEstacion, "direccion": int | None}
+        # Cache: número C1..C10 -> {"id": idEstacion, "direccion": Optional[int]}
         self.estaciones_info = self._cargar_estaciones_desde_db()
 
         # === Frame del logo ===

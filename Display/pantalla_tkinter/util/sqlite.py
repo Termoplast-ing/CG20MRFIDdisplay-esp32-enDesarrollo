@@ -1,5 +1,6 @@
 import sqlite3 as sqlite
 import os
+from typing import Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'comederos.db')
 
@@ -387,7 +388,7 @@ def obtenerEstaciones():
     return filas
 
 
-def actualizarDireccionEstacion(id_estacion: int, direccion: int | None):
+def actualizarDireccionEstacion(id_estacion: int, direccion: Optional[int]):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
