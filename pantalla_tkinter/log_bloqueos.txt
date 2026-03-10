@@ -1,0 +1,3 @@
+2026-03-10 07:17:34 - Bloqueo Dosis: Carav 999000202400018. Dosis: 2 >= 2
+2026-03-10 07:18:08 - Bloqueo Dosis: Carav 999000202400006. Dosis: 2 >= 2
+2026-03-10 07:28:12 - Bloqueo Dosis: Carav 982000459579974. Dosis: 2 >= 2
