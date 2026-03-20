@@ -1,0 +1,84 @@
+{}
+ main.py
+Iniciando script..
+Puerto serial abierto
+Esperando inicio de timestamp...
+Byte recibido: '<'
+Delimitador inicial '<' recibido
+Byte recibido: '2'
+Timestamp parcial: '2'
+Byte recibido: '0'
+Timestamp parcial: '20'
+Byte recibido: '2'
+Timestamp parcial: '202'
+Byte recibido: '6'
+Timestamp parcial: '2026'
+Byte recibido: '-'
+Timestamp parcial: '2026-'
+Byte recibido: '0'
+Timestamp parcial: '2026-0'
+Byte recibido: '3'
+Timestamp parcial: '2026-03'
+Byte recibido: '-'
+Timestamp parcial: '2026-03-'
+Byte recibido: '1'
+Timestamp parcial: '2026-03-1'
+Byte recibido: '3'
+Timestamp parcial: '2026-03-13'
+Byte recibido: ' '
+Timestamp parcial: '2026-03-13 '
+Byte recibido: '0'
+Timestamp parcial: '2026-03-13 0'
+Byte recibido: '9'
+Timestamp parcial: '2026-03-13 09'
+Byte recibido: ':'
+Timestamp parcial: '2026-03-13 09:'
+Byte recibido: '5'
+Timestamp parcial: '2026-03-13 09:5'
+Byte recibido: '1'
+Timestamp parcial: '2026-03-13 09:51'
+Byte recibido: ':'
+Timestamp parcial: '2026-03-13 09:51:'
+Byte recibido: '0'
+Timestamp parcial: '2026-03-13 09:51:0'
+Byte recibido: '5'
+Timestamp parcial: '2026-03-13 09:51:05'
+Byte recibido: '>'
+Delimitador final '>' recibido
+Fri 13 Mar 09:51:05 GMT 2026
+Enviando configuración (origen: SQLite)
+ESP32 respondió: <2026-03-13 09:51:05><2026-03-13 09:51:05>CONFIG_RECEIVED
+Confirmación 'OK' enviada al ESP32 (si procede)
+Hora del sistema ahora: 2026-03-13 13:24:59.108101
+^[^CException in Tkinter callback
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 814, in callit
+    func(*args)
+  File "/home/cg20mrfid/Desktop/pantalla_tkinter/pages/estaciones.py", line 1043, in actualizar_tabla
+    datos = self.cargar_datos_db()
+  File "/home/cg20mrfid/Desktop/pantalla_tkinter/pages/estaciones.py", line 993, in cargar_datos_db
+    filas = db_local.obtenerLecturas()
+  File "/home/cg20mrfid/Desktop/pantalla_tkinter/util/sqlite.py", line 589, in obtenerLecturas
+    filas = cur.fetchall()
+KeyboardInterrupt
+^C^CException in Tkinter callback
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 1892, in __call__
+    return self.func(*args)
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 814, in callit
+    func(*args)
+  File "/home/cg20mrfid/Desktop/pantalla_tkinter/forms/form_master.py", line 183, in actualizar_reloj
+    self.after(1000, self.actualizar_reloj)
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 821, in after
+    name = self._register(callit)
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 1528, in _register
+    self.tk.createcommand(name, f)
+KeyboardInterrupt
+^CTraceback (most recent call last):
+  File "/home/cg20mrfid/Desktop/pantalla_tkinter/main.py", line 212, in <module>
+    App.mainloop()
+  File "/usr/lib/python3.9/tkinter/__init__.py", line 1429, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
